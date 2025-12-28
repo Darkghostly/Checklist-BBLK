@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#111827">
+    <title>RO-TEC-001 | Sistema de Controlo Operacional</title>
+    
+    <link rel="manifest" href="./manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #111827; }
+        .task-item.completed label { text-decoration: line-through; color: #6b7280; }
+        .task-item.expired { opacity: 0.5; border-color: #ef444455; background-color: #ef444405; }
+        .task-item.expired label { color: #9ca3af; }
+        .task-item.expired .deadline-label { color: #ef4444; font-weight: bold; }
+        
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .accordion-content.open { max-height: 2000px; }
+        .nav-link.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        .status-online { background-color: #10b981; box-shadow: 0 0 10px #10b981; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Checkbox Customizado */
+        input[type="checkbox"] {
+            width: 1.5rem;
+            height: 1.5rem;
+            cursor: pointer;
+            border-radius: 0.375rem;
+            border: 2px solid #374151;
+            background-color: #1f2937;
+            appearance: none;
+            position: relative;
+            transition: all 0.2s;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+            background-color: #111827;
+            border-color: #374151;
+        }
+        input[type="checkbox"]:checked::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: white;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="text-gray-200 flex flex-col md:flex-row h-screen overflow-hidden">
+
+    <!-- Modal de Identificação -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-800">
+            <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <i class="fas fa-user-gear text-blue-500 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2 text-center">Acesso Técnico</h2>
+            <p class="text-gray-400 mb-6 text-sm text-center">Identifique-se para sincronizar o seu roteiro no projeto <b>checklist-bblk</b>.</p>
+            <input type="text" id="user-name-input" placeholder="O seu nome (ex: João Luz)" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-4 text-white mb-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            <button id="start-app-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                Começar Operação <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+            <div id="auth-error-msg" class="mt-4 text-xs text-red-500 text-center hidden">Erro de ligação. Verifique a sua internet ou as regras do Firebase.</div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 bg-gray-900 p-6 space-y-6 flex-shrink-0 flex flex-col border-r border-gray-800 z-10">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-900/20">
+                    <i class="fas fa-bolt text-white"></i>
+                </div>
+                <h1 class="text-xl font-black text-white tracking-tighter uppercase">RO-TEC</h1>
+            </div>
+            <div id="connection-status" class="flex items-center text-[10px] text-emerald-500 font-bold tracking-widest uppercase">
+                <span class="status-dot status-online mr-2"></span> Cloud Sync
+            </div>
+        </div>
+        
+        <nav class="flex flex-row md:flex-col md:space-y-2 space-x-2 md:space-x-0 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+            <a href="#iluminacao" class="nav-link text-left px-4 py-3 rounded-xl hover:bg-gray-800 transition-all active flex-shrink-0">
+                <i class="fas fa-lightbulb w-6 mr-2"></i>Iluminação
+            </a>
+            <a href="#transmissao" class="nav-link text-left px-4 py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0">
+                <i class="fas fa-video w-6 mr-2"></i>Transmissão
+            </a>
+            <div class="border-t border-gray-800 my-4 hidden md:block"></div>
+            <a href="#admin" id="nav-admin" class="nav-link text-left px-4 py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-gray-400">
+                <i class="fas fa-shield-halved w-6 mr-2"></i>Painel Líder
+            </a>
+        </nav>
+
+        <div class="mt-auto hidden md:block p-4 bg-gray-800/50 rounded-xl border border-gray-800">
+            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Relógio do Sistema</p>
+            <p id="event-clock" class="text-xl font-mono text-blue-400">00:00:00</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto bg-gray-950">
+        
+        <!-- View: Operador -->
+        <div id="view-operator">
+            <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Checklist de Operação</h1>
+                    <div class="flex items-center gap-3 mt-2">
+                        <span id="display-operator-name" class="bg-blue-500/10 text-blue-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest border border-blue-500/20">A autenticar...</span>
+                        <span class="text-gray-600 text-xs">| RO-TEC-001 v2.0</span>
+                    </div>
+                </div>
+                <button id="reset-session" class="flex items-center gap-2 bg-gray-900 hover:bg-red-900/20 hover:text-red-500 text-gray-500 px-4 py-2 rounded-lg border border-gray-800 transition-all text-sm font-medium">
+                    <i class="fas fa-sync-alt"></i> Reset Completo
+                </button>
+            </header>
+
+            <!-- Secção: Iluminação -->
+            <section id="iluminacao" class="section-content space-y-6">
+                <!-- Fase 1 -->
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                    <button class="accordion-toggle w-full text-left p-5 font-bold bg-gray-900 flex justify-between items-center group">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">T-1h30</span>
+                            <span class="text-lg text-white group-hover:text-blue-400 transition-colors">Arranque Técnico</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-600 transition-transform"></i>
+                    </button>
+                    <div class="accordion-content border-t border-gray-800 bg-gray-900/50 p-6 space-y-4">
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="luz-1" class="cloud-sync" data-deadline="17:30">
+                            <div class="ml-4">
+                                <label for="luz-1" class="font-semibold text-white block">Ligar Disjuntores e Racks de Força</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 17:30</span>
+                            </div>
+                        </div>
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="luz-2" class="cloud-sync" data-deadline="17:45">
+                            <div class="ml-4">
+                                <label for="luz-2" class="font-semibold text-white block">Boot GrandMA2 e Verificação de Patch</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 17:45</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fase 2 -->
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                    <button class="accordion-toggle w-full text-left p-5 font-bold bg-gray-900 flex justify-between items-center group">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs bg-orange-900/20 text-orange-400 px-2 py-1 rounded">T-45min</span>
+                            <span class="text-lg text-white group-hover:text-blue-400 transition-colors">Checklist de Aparelhos</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-600 transition-transform"></i>
+                    </button>
+                    <div class="accordion-content border-t border-gray-800 bg-gray-900/50 p-6 space-y-4">
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="luz-3" class="cloud-sync" data-deadline="18:15">
+                            <div class="ml-4">
+                                <label for="luz-3" class="font-semibold text-white block">Teste de Lâmpadas (Movings e Estáticos)</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 18:15</span>
+                            </div>
+                        </div>
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="luz-4" class="cloud-sync" data-deadline="18:30">
+                            <div class="ml-4">
+                                <label for="luz-4" class="font-semibold text-white block">Preparar Máquinas de Haze/Fumo</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 18:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Secção: Transmissão -->
+            <section id="transmissao" class="section-content space-y-6 hidden">
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                    <button class="accordion-toggle w-full text-left p-5 font-bold bg-gray-900 flex justify-between items-center group">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">T-1h30</span>
+                            <span class="text-lg text-white group-hover:text-blue-400 transition-colors">Engenharia de Vídeo</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-600 transition-transform"></i>
+                    </button>
+                    <div class="accordion-content border-t border-gray-800 bg-gray-900/50 p-6 space-y-4">
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="trans-1" class="cloud-sync" data-deadline="17:30">
+                            <div class="ml-4">
+                                <label for="trans-1" class="font-semibold text-white block">Ligar vMix/Switcher e Multiview</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 17:30</span>
+                            </div>
+                        </div>
+                        <div class="task-item flex items-center p-3 rounded-xl border border-transparent transition-all">
+                            <input type="checkbox" id="trans-2" class="cloud-sync" data-deadline="17:50">
+                            <div class="ml-4">
+                                <label for="trans-2" class="font-semibold text-white block">Teste de Sincronismo Áudio/Vídeo</label>
+                                <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tighter">Horário limite: 17:50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- View: Admin -->
+        <div id="view-admin" class="hidden">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-white tracking-tight">Painel do Líder</h1>
+                <p class="text-gray-500 mt-2">Visão em tempo real de toda a equipa técnica.</p>
+            </div>
+            <div id="admin-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards dinâmicos aqui -->
+                <div class="bg-gray-900 p-8 rounded-2xl border border-gray-800 flex items-center justify-center">
+                    <p class="text-gray-600 italic">À espera de operadores...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // CONFIGURAÇÃO REAL DO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
+            authDomain: "checklist-bblk.firebaseapp.com",
+            projectId: "checklist-bblk",
+            storageBucket: "checklist-bblk.firebasestorage.app",
+            messagingSenderId: "187345070674",
+            appId: "1:187345070674:web:d3a203e3ad7cbe79a58d8b",
+            measurementId: "G-5GKJJ1NFDM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'checklist-bblk';
+
+        let operatorName = localStorage.getItem('op_name_v2') || "";
+        let syncUnsubscribe = null;
+
+        // --- RELÓGIO E REGRAS ---
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-PT', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            document.getElementById('event-clock').innerText = now.toLocaleTimeString('pt-PT', { hour12: false });
+            enforceDeadlines(timeStr);
+        }
+
+        function enforceDeadlines(currentTime) {
+            document.querySelectorAll('.cloud-sync').forEach(input => {
+                const deadline = input.getAttribute('data-deadline');
+                if (deadline) {
+                    const taskItem = input.closest('.task-item');
+                    // Se passar da hora e não estiver marcado, bloqueia
+                    if (currentTime > deadline && !input.checked) {
+                        input.disabled = true;
+                        taskItem.classList.add('expired');
+                        const label = taskItem.querySelector('.deadline-label');
+                        if (label && !label.innerHTML.includes('BLOQUEADO')) {
+                            label.innerHTML = `<i class="fas fa-lock mr-1"></i> BLOQUEADO (${deadline})`;
+                        }
+                    } else if (currentTime <= deadline) {
+                        input.disabled = false;
+                        taskItem.classList.remove('expired');
+                    }
+                }
+            });
+        }
+        setInterval(updateClock, 1000);
+
+        // --- AUTENTICAÇÃO ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Autenticado como:", user.uid);
+                if (operatorName) {
+                    document.getElementById('login-modal').classList.add('hidden');
+                    initOperatorView();
+                }
+            } else {
+                signInAnonymously(auth).catch(err => {
+                    console.error("Erro auth:", err);
+                    document.getElementById('auth-error-msg').classList.remove('hidden');
+                });
+            }
+        });
+
+        document.getElementById('start-app-btn').onclick = () => {
+            const name = document.getElementById('user-name-input').value.trim();
+            if (name) {
+                operatorName = name;
+                localStorage.setItem('op_name_v2', name);
+                document.getElementById('login-modal').classList.add('hidden');
+                initOperatorView();
+            }
+        };
+
+        // --- LÓGICA DO OPERADOR ---
+        function initOperatorView() {
+            if (!auth.currentUser) return;
+            document.getElementById('display-operator-name').innerText = `Operador: ${operatorName}`;
+            
+            if (syncUnsubscribe) syncUnsubscribe();
+            
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'live_sessions', auth.currentUser.uid);
+            
+            // Sincronização Bidirecional (Puxa da nuvem se já existir)
+            syncUnsubscribe = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const cloudData = docSnap.data().tasks || {};
+                    document.querySelectorAll('.cloud-sync').forEach(input => {
+                        input.checked = !!cloudData[input.id];
+                        input.closest('.task-item').classList.toggle('completed', input.checked);
+                    });
+                }
+            });
+
+            // Grava na nuvem ao clicar
+            document.querySelectorAll('.cloud-sync').forEach(input => {
+                input.onchange = async () => {
+                    const tasks = {};
+                    document.querySelectorAll('.cloud-sync').forEach(i => tasks[i.id] = i.checked);
+                    await setDoc(docRef, {
+                        name: operatorName,
+                        tasks: tasks,
+                        lastUpdate: new Date().toISOString(),
+                        uid: auth.currentUser.uid
+                    }, { merge: true });
+                };
+            });
+
+            initAdminDashboard();
+        }
+
+        // --- LÓGICA DO LÍDER ---
+        function initAdminDashboard() {
+            const container = document.getElementById('admin-cards-container');
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'live_sessions');
+
+            onSnapshot(colRef, (snapshot) => {
+                container.innerHTML = "";
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="col-span-full text-center p-12 text-gray-500">Sem operadores online no momento.</div>`;
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const taskEntries = Object.entries(data.tasks || {});
+                    const done = taskEntries.filter(([_, v]) => v).length;
+                    const total = taskEntries.length;
+                    const progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                    const card = document.createElement('div');
+                    card.className = "bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl transition-all hover:border-blue-500/50";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-6">
+                            <div><h3 class="text-lg font-bold text-white">${data.name}</h3><p class="text-[10px] text-emerald-500 uppercase tracking-widest mt-1"><span class="status-dot status-online mr-1"></span> Live</p></div>
+                            <div class="text-right"><span class="text-2xl font-black text-blue-500">${progress}%</span></div>
+                        </div>
+                        <div class="w-full bg-gray-800 rounded-full h-1.5 mb-6 overflow-hidden"><div class="bg-blue-600 h-full transition-all duration-700" style="width: ${progress}%"></div></div>
+                        <div class="flex justify-between text-[10px] text-gray-500 border-t border-gray-800 pt-4 uppercase font-bold">
+                            <span>${done} de ${total} tarefas</span>
+                            <span>Último sinal: ${new Date(data.lastUpdate).toLocaleTimeString()}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // --- RESET ---
+        document.getElementById('reset-session').onclick = async () => {
+            if (confirm("Deseja limpar todos os dados desta sessão?") && auth.currentUser) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'live_sessions', auth.currentUser.uid));
+                localStorage.removeItem('op_name_v2');
+                location.reload();
+            }
+        };
+
+        // --- NAVEGAÇÃO ---
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.onclick = (e) => {
+                e.preventDefault();
+                const target = link.getAttribute('href').substring(1);
+                document.getElementById('view-operator').classList.toggle('hidden', target === 'admin');
+                document.getElementById('view-admin').classList.toggle('hidden', target !== 'admin');
+                document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+                if (document.getElementById(target)) document.getElementById(target).classList.remove('hidden');
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            };
+        });
+
+        document.querySelectorAll('.accordion-toggle').forEach(btn => {
+            btn.onclick = () => {
+                btn.nextElementSibling.classList.toggle('open');
+                btn.querySelector('i').classList.toggle('rotate-180');
+            };
+        });
+
+        updateClock();
+    </script>
+</body>
+</html>

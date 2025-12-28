@@ -1,0 +1,24 @@
+{
+"name": "RO-TEC | Controle Operacional",
+"short_name": "RO-TEC",
+"description": "Sistema de Gestão de Roteiros Técnicos para Transmissão e Iluminação.",
+"start_url": "./index.html",
+"display": "standalone",
+"background_color": "#111827",
+"theme_color": "#3b82f6",
+"orientation": "portrait-primary",
+"icons": [
+{
+"src": "https://www.google.com/search?q=https://cdn-icons-png.flaticon.com/512/900/900797.png",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any maskable"
+},
+{
+"src": "https://www.google.com/search?q=https://cdn-icons-png.flaticon.com/512/900/900797.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+]
+}
