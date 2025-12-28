@@ -116,13 +116,12 @@
                 <i class="fas fa-lightbulb w-5 mr-1.5"></i>Luz
             </a>
             <a href="#transmissao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
-                <i class="fas fa-video w-5 mr-1.5"></i>Vídeo
+                <i class="fas fa-video w-5 mr-1.5"></i>Transmissão
+            </a>
+            <a href="#projecao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
+                <i class="fas fa-video w-5 mr-1.5"></i>Projeção
             </a>
         </nav>
-
-        <div class="mt-auto hidden md:block p-4 bg-gray-800/50 rounded-xl border border-gray-800 text-center">
-            <p id="event-clock-desktop" class="text-xl font-mono text-blue-400">00:00:00</p>
-        </div>
     </aside>
 
     <!-- Main Content -->
@@ -138,36 +137,47 @@
                             <span id="display-service-time" class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">--:--</span>
                         </div>
                     </div>
-                    <button id="reset-session" type="button" class="bg-gray-900/80 active:bg-red-900/50 text-gray-400 hover:text-red-400 border border-gray-800 p-2.5 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm">
-                        <i class="fas fa-power-off md:mr-2"></i><span class="hidden md:inline">Reset</span>
+                    <button id="reset-session" class="">
+                        <i class=""></i><span class="hidden md:inline"></span>
                     </button>
                 </header>
 
                 <section id="iluminacao" class="section-content space-y-4 md:space-y-6">
-                    <!-- T-1h30 -->
+                    <!-- T-1h -->
                     <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                         <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                             <div class="flex items-center gap-3">
-                                <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50">T-90</span>
-                                <span class="text-base md:text-lg text-white">Arranque Técnico</span>
+                                <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50">T-60</span>
+                                <span class="text-base md:text-lg text-white">Pré-Culto</span>
                             </div>
                             <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                         </button>
                         <div class="accordion-content border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3 md:space-y-4">
                             <div class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors">
-                                <input type="checkbox" id="luz-1" class="cloud-sync mt-0.5 md:mt-0" data-offset="90">
+                                <input type="checkbox" id="luz-computador" class="cloud-sync mt-0.5 md:mt-0" data-offset="60">
                                 <div class="ml-3 flex-1">
-                                    <label for="luz-1" class="text-sm md:text-base font-semibold text-white block leading-tight">Ligar Disjuntores e Racks</label>
+                                    <label for="luz-computador" class="text-sm md:text-base font-semibold text-white block leading-tight">Ligar computador iluminação</label>
                                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                                 </div>
                             </div>
+                            
                             <div class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors">
-                                <input type="checkbox" id="luz-2" class="cloud-sync mt-0.5 md:mt-0" data-offset="75">
+                                <input type="checkbox" id="luz-software" class="cloud-sync mt-0.5 md:mt-0" data-offset="55">
                                 <div class="ml-3 flex-1">
-                                    <label for="luz-2" class="text-sm md:text-base font-semibold text-white block leading-tight">Boot GrandMA2 e Patch</label>
+                                    <label for="luz-software" class="text-sm md:text-base font-semibold text-white block leading-tight">Iniciar o software GrandMA2</label>
                                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                                 </div>
                             </div>
+
+                            <div class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors">
+                                <input type="checkbox" id="luz-radio" class="cloud-sync mt-0.5 md:mt-0" data-offset="45">
+                                <div class="ml-3 flex-1">
+                                    <label for="luz-radio" class="text-sm md:text-base font-semibold text-white block leading-tight">Rádio para comunicação com projeção</label>
+                                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                                </div>
+                            </div>
+
+                            
                         </div>
                     </div>
 
@@ -182,16 +192,16 @@
                         </button>
                         <div class="accordion-content border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3 md:space-y-4">
                             <div class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors">
-                                <input type="checkbox" id="luz-3" class="cloud-sync mt-0.5 md:mt-0" data-offset="45">
+                                <input type="checkbox" id="luz-teste-lampadas" class="cloud-sync mt-0.5 md:mt-0" data-offset="45">
                                 <div class="ml-3 flex-1">
-                                    <label for="luz-3" class="text-sm md:text-base font-semibold text-white block leading-tight">Teste de Lâmpadas</label>
+                                    <label for="luz-teste-lampadas" class="text-sm md:text-base font-semibold text-white block leading-tight">Teste de Lâmpadas</label>
                                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                                 </div>
                             </div>
                             <div class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors">
-                                <input type="checkbox" id="luz-4" class="cloud-sync mt-0.5 md:mt-0" data-offset="30">
+                                <input type="checkbox" id="luz-preparar-haze" class="cloud-sync mt-0.5 md:mt-0" data-offset="30">
                                 <div class="ml-3 flex-1">
-                                    <label for="luz-4" class="text-sm md:text-base font-semibold text-white block leading-tight">Preparar Haze/Fumo</label>
+                                    <label for="luz-preparar-haze" class="text-sm md:text-base font-semibold text-white block leading-tight">Preparar Haze/Fumo</label>
                                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                                 </div>
                             </div>
