@@ -1,11 +1,11 @@
 const CACHE_NAME = 'rotec-v3';
 
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  '/Checklist-BBLK/',
+  '/Checklist-BBLK/index.html',
+  '/Checklist-BBLK/manifest.json',
+  '/Checklist-BBLK/icons/icon-192.png',
+  '/Checklist-BBLK/icons/icon-512.png',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
 ];

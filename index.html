@@ -553,9 +553,11 @@
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
-            .register("/service-worker.js")
-            .then((reg) => console.log("SW registrado com sucesso:", reg.scope))
-            .catch((err) => console.error("SW falhou:", err));
+            .register("/Checklist-BBLK/service-worker.js", {
+              scope: "/Checklist-BBLK/",
+            })
+            .then((reg) => console.log("SW OK, scope:", reg.scope))
+            .catch((err) => console.error("SW erro:", err));
         });
       }
 
@@ -753,7 +755,7 @@
         link.onclick = (e) => {
           e.preventDefault();
           const target = link.getAttribute("href").substring(1);
-          
+
           // Remove admin view toggle logic
           document
             .querySelectorAll(".nav-link")
