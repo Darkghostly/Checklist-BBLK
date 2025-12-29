@@ -1,47 +1,45 @@
-const CACHE_NAME = 'rotec-v3';
+const CACHE_NAME = 'rotec-v4';
 
 const ASSETS_TO_CACHE = [
   '/Checklist-BBLK/',
   '/Checklist-BBLK/index.html',
   '/Checklist-BBLK/manifest.json',
-  '/Checklist-BBLK/icons/icon-192.png',
-  '/Checklist-BBLK/icons/icon-512.png',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
+  '/Checklist-BBLK/icons/icon-192x192.png',
+  '/Checklist-BBLK/icons/icon-512x512.png'
 ];
 
-self.addEventListener('install', (event) => {
+// INSTALL
+self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
-self.addEventListener('activate', (event) => {
+// ACTIVATE
+self.addEventListener('activate', event => {
   event.waitUntil(
     Promise.all([
       self.clients.claim(),
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(name => {
-            if (name !== CACHE_NAME) {
-              return caches.delete(name);
-            }
-          })
-        );
-      })
+      caches.keys().then(keys =>
+        Promise.all(
+          keys.map(key => key !== CACHE_NAME && caches.delete(key))
+        )
+      )
     ])
   );
 });
 
-self.addEventListener('fetch', (event) => {
+// FETCH (cache-first com fallback)
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).catch(() =>
+        caches.match('/Checklist-BBLK/index.html')
+      );
+    })
   );
 });
