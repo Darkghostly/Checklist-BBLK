@@ -550,26 +550,21 @@
       let selectedTime = localStorage.getItem("service_time") || "18:00";
 
       // REGISTO DO SW
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", async () => {
-          try {
-            const reg = await navigator.serviceWorker.register(
-              "/Checklist-BBLK/service-worker.js",
-              { scope: "/Checklist-BBLK/" }
-            );
+      if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/Checklist-BBLK/service-worker.js', {
+        scope: '/Checklist-BBLK/',
+      })
+      .then(reg => {
+        console.log('✅ SW registrado:', reg.scope);
+      })
+      .catch(err => {
+        console.error('❌ Erro ao registrar SW:', err);
+      });
+  });
+}
 
-            console.log("✅ SW registrado:", reg.scope);
-
-            // FORÇA CONTROLE APÓS PRIMEIRA INSTALAÇÃO
-            if (!navigator.serviceWorker.controller) {
-              console.log("🔁 Recarregando para o SW assumir controle...");
-              window.location.reload();
-            }
-          } catch (err) {
-            console.error("❌ Erro no SW:", err);
-          }
-        });
-      }
 
       // --- LÓGICA DE HORÁRIOS ---
       const sidebarSelect = document.getElementById("sidebar-service-select");
