@@ -265,7 +265,7 @@
         // REGISTO DO SW
         if ('serviceWorker' in navigator) {
             if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-                window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js')
+                window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js')
                     .catch(err => console.log('SW falhou:', err)));
             }
         }
