@@ -248,9 +248,10 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
       import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-      import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+      import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
       const firebaseConfig = {
+        // ... MANTENHA SUAS CHAVES AQUI ...
         apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
         authDomain: "checklist-bblk.firebaseapp.com",
         projectId: "checklist-bblk",
@@ -263,11 +264,22 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
+      // --- OTIMIZAÇÃO 1: BANCO DE DADOS OFFLINE ---
+      // Isso faz o checklist carregar instantâneo usando dados em cache
+      enableIndexedDbPersistence(db).catch((err) => {
+          if (err.code == 'failed-precondition') {
+              console.log('Múltiplas abas abertas, persistência habilitada apenas em uma.');
+          } else if (err.code == 'unimplemented') {
+              console.log('Navegador não suporta persistência.');
+          }
+      });
+
       // ESTADO
-      let userRole = "iluminacao"; // valor padrão
+      let userRole = "iluminacao";
       let userName = "";
       let serviceTime = "18:00";
       let docId = "";
+      let appReady = false; // Impede recarregamentos duplos
 
       // UI LOGIN
       const roleSelect = document.getElementById("role-select");
@@ -281,6 +293,7 @@
         }
       });
 
+      // --- OTIMIZAÇÃO 2: LÓGICA DE LOGIN INTELIGENTE ---
       document.getElementById("start-app-btn").onclick = async () => {
         const nameInput = document.getElementById("user-name-input").value.trim();
         const selectedRole = roleSelect.value;
@@ -303,22 +316,40 @@
         const today = new Date().toISOString().split('T')[0];
         docId = `${today}_${serviceTime.replace(':','-')}`;
 
-        try {
-            document.getElementById("start-app-btn").innerText = "Carregando...";
-            await signInAnonymously(auth);
-        } catch (error) {
-            console.error(error);
-            alert("Erro de conexão.");
+        document.getElementById("start-app-btn").innerText = "Entrando...";
+
+        // A MÁGICA: Se já tem usuário, não espera a rede!
+        if (auth.currentUser) {
+            console.log("Usuário já autenticado (Cache). Entrando instantaneamente.");
+            iniciarSistema(); 
+        } else {
+            console.log("Conectando ao servidor...");
+            try {
+                await signInAnonymously(auth);
+                // O onAuthStateChanged vai chamar o iniciarSistema()
+            } catch (error) {
+                console.error(error);
+                alert("Erro de conexão. Verifique sua internet.");
+                document.getElementById("start-app-btn").innerText = "Tentar Novamente";
+            }
         }
       };
 
+      // Monitora apenas a primeira conexão ou desconexões
       onAuthStateChanged(auth, (user) => {
-        if (user && userName) {
-            document.getElementById("login-modal").classList.add("hidden");
-            setupInterface();
-            connectDB();
+        if (user && userName && !appReady) {
+            iniciarSistema();
         }
       });
+
+      function iniciarSistema() {
+        if(appReady) return; // Evita rodar duas vezes
+        appReady = true;
+
+        document.getElementById("login-modal").classList.add("hidden");
+        setupInterface();
+        connectDB();
+      }
 
       // CONFIGURA A VISIBILIDADE BASEADA NO CARGO
       function setupInterface() {
@@ -327,28 +358,21 @@
         document.getElementById("display-role-title").innerText = userRole.toUpperCase();
         document.getElementById("role-badge").innerText = userRole === 'admin' ? 'ADMINISTRADOR' : 'OPERADOR';
         
-        // Lógica de Visão Independente
         const allSections = document.querySelectorAll('.section-content');
         const allNavBtns = document.querySelectorAll('.nav-link');
 
         if (userRole === 'admin') {
-            // Admin vê tudo
             document.body.classList.add("show-tags");
             document.getElementById("admin-controls").classList.remove("hidden");
-            // Mostra todos botões de navegação
             allNavBtns.forEach(btn => btn.classList.remove('hidden-role'));
         } else {
-            // Operador vê só o seu
             allNavBtns.forEach(btn => {
-                // Se o ID do botão não contém o nome da role (ex: btn-nav-iluminacao contém iluminacao)
                 if (!btn.id.includes(userRole)) {
-                    btn.classList.add('hidden-role'); // Esconde botão na sidebar
+                    btn.classList.add('hidden-role');
                 } else {
-                    btn.click(); // Clica automaticamente no botão dele para abrir a aba certa
+                    btn.click(); 
                 }
             });
-            
-            // Força esconder seções que não são da role (segurança visual)
             allSections.forEach(sec => {
                 if (sec.id !== userRole) sec.classList.add('hidden');
             });
@@ -358,11 +382,14 @@
       function connectDB() {
         const sessionRef = doc(db, "ro_tec_sessions", docId);
         
+        // O snapshot agora usa cache local primeiro (graças ao enableIndexedDbPersistence)
         onSnapshot(sessionRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 updateCheckboxes(data.tasks || {});
             } else {
+                // Só tenta criar se for Admin ou se o doc realmente não existir
+                // Evita escritas desnecessárias de operadores
                 setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
             }
         });
@@ -374,6 +401,7 @@
                     user: e.target.checked ? userName : null,
                     timestamp: new Date().toISOString()
                 };
+                // Atualização Otimista: A UI já mudou, o Firebase sincroniza em background
                 await setDoc(sessionRef, { tasks: { [e.target.id]: taskData } }, { merge: true });
             };
         });
@@ -384,7 +412,12 @@
         document.querySelectorAll(".firebase-sync").forEach(input => {
             const task = tasksData[input.id];
             if (task) {
-                input.checked = task.checked;
+                // Só atualiza visualmente se estiver diferente para evitar "flicker"
+                if (input.checked !== task.checked) {
+                    input.checked = task.checked;
+                    input.closest(".task-item").classList.toggle("completed", input.checked);
+                }
+                
                 const tag = input.closest(".task-item").querySelector(".user-tag");
                 if (tag) {
                     tag.innerText = task.user || "";
@@ -392,8 +425,8 @@
                 }
             } else {
                 input.checked = false;
+                input.closest(".task-item").classList.remove("completed");
             }
-            input.closest(".task-item").classList.toggle("completed", input.checked);
         });
       }
 
@@ -431,9 +464,7 @@
       document.querySelectorAll(".nav-link").forEach(link => {
         link.onclick = (e) => {
             e.preventDefault();
-            // Se o usuário não for admin e tentar clicar em outra aba, ignora
             if (userRole !== 'admin' && !link.id.includes(userRole)) return;
-            
             document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
             link.classList.add("active");
             document.querySelectorAll(".section-content").forEach(s => s.classList.add("hidden"));
