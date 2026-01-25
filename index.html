@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#111827" />
-    <title>RO-TEC-001 | Checklist Operacional</title>
+    <title>RO-TEC | Online Sync</title>
 
     <link rel="manifest" href="/Checklist-BBLK/manifest.json" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,515 +21,234 @@
     />
 
     <style>
-      /* Fix Crítico para Mobile (App-like feel) */
-      html,
-      body {
-        height: 100%;
-        width: 100%;
-        overflow: hidden; /* Impede scroll no body */
-        overscroll-behavior: none; /* Remove bounce effect */
-        background-color: #111827;
-        font-family: "Inter", sans-serif;
-        -webkit-tap-highlight-color: transparent;
+      /* --- ESTILOS GERAIS --- */
+      html, body {
+        height: 100%; width: 100%; overflow: hidden;
+        overscroll-behavior: none; background-color: #111827;
+        font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent;
+      }
+      #main-scroll-area { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+      
+      .task-item.completed label { text-decoration: line-through; color: #6b7280; }
+      
+      /* Animação de Update em Tempo Real */
+      .task-item.just-updated { animation: highlightPulse 2s ease-out; }
+      @keyframes highlightPulse {
+        0% { background-color: rgba(59, 130, 246, 0.3); }
+        100% { background-color: transparent; }
       }
 
-      /* Área de Scroll Suave */
-      #main-scroll-area {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
-      }
-
-      .task-item.completed label {
-        text-decoration: line-through;
-        color: #6b7280;
-      }
-
-      /* Estilo Expirado/Bloqueado */
-      .task-item.expired {
-        opacity: 0.6;
-        border-color: #374151;
-        background-color: #1f293780;
-      }
-      .task-item.expired label {
-        color: #6b7280;
-        cursor: not-allowed;
-      }
-      .task-item.expired .deadline-label {
-        color: #ef4444;
-        font-weight: bold;
-      }
-
-      .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .accordion-content.open {
-        max-height: 2000px;
-      }
-      .nav-link.active {
-        background-color: #3b82f6;
-        color: white;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      }
-      .status-dot {
-        height: 8px;
-        width: 8px;
-        border-radius: 50%;
-        display: inline-block;
-      }
-      .status-online {
-        background-color: #10b981;
-        box-shadow: 0 0 10px #10b981;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-
+      .task-item.expired { opacity: 0.6; border-color: #374151; background-color: #1f293780; }
+      .task-item.expired label { color: #6b7280; cursor: not-allowed; }
+      .task-item.expired .deadline-label { color: #ef4444; font-weight: bold; }
+      
+      .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+      .accordion-content.open { max-height: 2000px; }
+      
+      /* Navegação */
+      .nav-link.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+      .nav-link.hidden-role { display: none !important; } /* Esconde abas não permitidas */
+      
+      /* Checkbox */
       input[type="checkbox"] {
-        width: 1.5rem;
-        height: 1.5rem;
-        cursor: pointer;
-        border-radius: 0.375rem;
-        border: 2px solid #374151;
-        background-color: #1f2937;
-        appearance: none;
-        position: relative;
-        transition: all 0.2s;
-        flex-shrink: 0;
+        width: 1.5rem; height: 1.5rem; cursor: pointer; border-radius: 0.375rem;
+        border: 2px solid #374151; background-color: #1f2937; appearance: none;
+        position: relative; transition: all 0.2s; flex-shrink: 0;
       }
-      input[type="checkbox"]:checked {
-        background-color: #3b82f6;
-        border-color: #3b82f6;
-      }
-      input[type="checkbox"]:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-        background-color: #111827;
-        border-color: #4b5563;
-      }
+      input[type="checkbox"]:checked { background-color: #3b82f6; border-color: #3b82f6; }
       input[type="checkbox"]:checked::after {
-        content: "\f00c";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        color: white;
-        font-size: 0.8rem;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+        color: white; font-size: 0.8rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       }
+      
+      /* Tags de Usuário (Só Admin vê) */
+      .user-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; font-weight: bold; display: none; }
+      .show-tags .user-tag { display: inline-block; }
     </style>
   </head>
   <body class="text-gray-200 flex flex-col md:flex-row fixed inset-0">
-    <!-- Modal de Identificação -->
-    <div
-      id="login-modal"
-      class="fixed inset-0 bg-gray-950/95 z-[60] flex items-center justify-center p-4 backdrop-blur-sm"
-    >
-      <div
-        class="bg-gray-900 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-gray-800 mx-4"
-      >
-        <div
-          class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mb-4 mx-auto"
-        >
-          <i class="fas fa-clipboard-check text-blue-500 text-xl"></i>
+    
+    <div id="info-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-gray-900 border border-gray-700 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center p-5 border-b border-gray-800 bg-gray-800/50">
+                <h3 id="info-title" class="text-xl font-bold text-white">Título</h3>
+                <a id="info-link" href="#" target="_blank" class="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:scale-110 transition-transform">
+                    <i class="fas fa-play text-sm ml-0.5"></i>
+                </a>
+            </div>
+            <div class="p-6">
+                <p id="info-desc" class="text-gray-300 leading-relaxed text-sm md:text-base">Descrição...</p>
+            </div>
+            <div class="p-4 bg-gray-950/50 flex justify-end">
+                <button onclick="fecharModalInfo()" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm">Fechar</button>
+            </div>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1 text-center">
-          Roteiro Técnico
-        </h2>
-        <p class="text-gray-400 mb-6 text-xs text-center">
-          Identifique-se para iniciar o seu checklist pessoal.
-        </p>
-        <input
-          type="text"
-          id="user-name-input"
-          placeholder="O seu nome"
-          class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white mb-3 text-sm outline-none focus:border-blue-500 transition-colors"
-        />
+    </div>
 
-        <label
-          class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider"
-          >Selecione o Culto:</label
-        >
-        <select
-          id="modal-service-select"
-          class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white mb-6 text-sm outline-none appearance-none focus:border-blue-500 transition-colors"
-        >
-          <option value="10:00">Domingo Manhã (10h)</option>
-          <option value="18:00" selected>Domingo Noite (18h)</option>
-          <option value="20:00">Quinta Feira (20h)</option>
-        </select>
+    <div id="login-modal" class="fixed inset-0 bg-gray-950/95 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+      <div class="bg-gray-900 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-gray-800 relative">
+        
+        <div class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+            <i class="fas fa-user-shield text-blue-500 text-xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-1 text-center">Acesso RO-TEC</h2>
+        <p class="text-gray-400 mb-6 text-xs text-center">Selecione sua função para hoje</p>
+        
+        <div class="mb-3">
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
+            <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
+        </div>
 
-        <button
-          id="start-app-btn"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20 active:scale-95"
-        >
-          Começar Checklist
+        <div class="mb-3">
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto / Evento</label>
+            <select id="modal-service-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
+            <option value="10:00">Domingo Manhã (10h)</option>
+            <option value="18:00" selected>Domingo Noite (18h)</option>
+            <option value="20:00">Quinta Feira (20h)</option>
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Sua Função Hoje</label>
+            <select id="role-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
+                <option value="iluminacao">💡 Iluminação</option>
+                <option value="transmissao">🎥 Transmissão/Vídeo</option>
+                <option value="admin">🛡️ Administrador Geral</option>
+            </select>
+            
+            <div id="admin-pass-container" class="hidden mt-3">
+                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
+            </div>
+        </div>
+
+        <button id="start-app-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">
+          Entrar
         </button>
-        <div
-          id="auth-error-msg"
-          class="mt-4 text-xs text-red-500 text-center hidden"
-        >
-          Erro de ligação. Verifique a internet.
-        </div>
       </div>
     </div>
 
-    <!-- Sidebar / Header Mobile Compacto -->
-    <aside
-      class="w-full md:w-72 bg-gray-900 p-3 md:p-6 flex-shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-gray-800 z-10 shadow-lg md:shadow-none"
-    >
+    <aside class="w-full md:w-72 bg-gray-900 p-3 md:p-6 flex-shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-gray-800 z-10 shadow-lg">
       <div class="flex justify-between items-center mb-3 md:mb-6">
         <div class="flex items-center gap-3">
-          <div
-            class="bg-blue-600 p-1.5 md:p-2 rounded-lg shadow-lg shadow-blue-900/20"
-          >
-            <i
-              class="fas fa-clipboard-list text-white text-xs md:text-base"
-            ></i>
+          <div class="bg-blue-600 p-1.5 md:p-2 rounded-lg shadow-lg shadow-blue-900/20">
+            <i class="fas fa-satellite-dish text-white text-xs md:text-base"></i>
           </div>
           <div>
-            <h1
-              class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none"
-            >
-              RO-TEC
-            </h1>
-            <span class="text-[10px] text-gray-500 font-medium md:hidden block"
-              >Checklist Pessoal</span
-            >
+            <h1 class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none">RO-TEC</h1>
+            <span id="role-badge" class="text-[10px] text-gray-500 font-medium block">...</span>
           </div>
         </div>
         <div class="flex flex-col items-end">
-          <div
-            id="connection-status"
-            class="flex items-center text-[10px] text-emerald-500 font-bold tracking-widest uppercase bg-emerald-900/10 px-2 py-1 rounded-full border border-emerald-900/20"
-          >
-            <span class="status-dot status-online mr-1.5"></span> Sync
+          <div class="flex items-center text-[10px] text-emerald-500 font-bold tracking-widest uppercase bg-emerald-900/10 px-2 py-1 rounded-full border border-emerald-900/20">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> Sync
           </div>
         </div>
       </div>
 
-      <div
-        class="bg-gray-800 p-2 md:p-3 rounded-xl border border-gray-700 mb-2 md:mb-6 flex items-center justify-between md:block"
-      >
-        <label
-          class="block text-[10px] text-gray-500 uppercase font-bold md:mb-2 mr-2 md:mr-0 whitespace-nowrap"
-          >Horário:</label
-        >
-        <select
-          id="sidebar-service-select"
-          class="bg-gray-900 text-white text-xs md:text-sm p-1.5 md:p-2 rounded-lg border border-gray-700 outline-none w-full md:w-full max-w-[150px] md:max-w-none"
-        >
-          <option value="10:00">Dom 10h</option>
-          <option value="18:00">Dom 18h</option>
-          <option value="20:00">Qui 20h</option>
-        </select>
+      <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4 hidden md:block">
+        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Operador:</div>
+        <div id="sidebar-user-name" class="text-white font-semibold truncate">...</div>
       </div>
 
-      <!-- Navegação Simplificada -->
-      <nav
-        class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto scrollbar-hide pb-1"
-      >
-        <a
-          href="#iluminacao"
-          class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all active flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center"
-        >
-          <i class="fas fa-lightbulb w-5 mr-1.5"></i>Luz
+      <nav id="nav-container" class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto pb-1 scrollbar-hide">
+        <a href="#iluminacao" id="btn-nav-iluminacao" class="nav-link active text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
+          <i class="fas fa-lightbulb w-5 mr-1.5"></i>Iluminação
         </a>
-        <a
-          href="#transmissao"
-          class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center"
-        >
+        <a href="#transmissao" id="btn-nav-transmissao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
           <i class="fas fa-video w-5 mr-1.5"></i>Transmissão
         </a>
-        <a
-          href="#projecao"
-          class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center"
-        >
-          <i class="fas fa-video w-5 mr-1.5"></i>Projeção
-        </a>
       </nav>
+      
+      <div id="admin-controls" class="mt-auto hidden">
+        <button id="admin-reset-btn" class="w-full border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
+            <i class="fas fa-trash-arrow-up mr-2"></i> Resetar Tudo
+        </button>
+      </div>
     </aside>
 
-    <!-- Main Content -->
-    <main
-      id="main-scroll-area"
-      class="flex-1 overflow-y-auto bg-gray-950 relative w-full"
-    >
+    <main id="main-scroll-area" class="flex-1 overflow-y-auto bg-gray-950 relative w-full">
       <div class="p-4 md:p-8 pb-24 md:pb-8 max-w-4xl mx-auto">
-        <div id="view-operator">
-          <header class="mb-6 md:mb-8 flex items-center justify-between">
+        <header class="mb-6 md:mb-8 flex items-center justify-between">
             <div>
-              <h1
-                class="text-2xl md:text-3xl font-bold text-white tracking-tight"
-              >
-                Checklist
-              </h1>
+              <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Checklist</h1>
               <div class="flex items-center gap-2 mt-1">
-                <span
-                  id="display-operator-name"
-                  class="text-blue-400 text-[10px] font-bold uppercase tracking-widest bg-blue-900/20 px-2 py-0.5 rounded border border-blue-900/30"
-                  >...</span
-                >
-                <span
-                  id="display-service-time"
-                  class="text-gray-500 text-[10px] font-bold uppercase tracking-widest"
-                  >--:--</span
-                >
+                <span id="display-service-time" class="text-blue-400 text-[10px] font-bold uppercase tracking-widest bg-blue-900/20 px-2 py-0.5 rounded border border-blue-900/30">--:--</span>
+                <span id="display-role-title" class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Geral</span>
               </div>
             </div>
-            <button id="reset-session" class="">
-              <i class=""></i><span class="hidden md:inline"></span>
-            </button>
-          </header>
+        </header>
 
-          <section
-            id="iluminacao"
-            class="section-content space-y-4 md:space-y-6"
-          >
-            <!-- T-1h -->
-            <div
-              class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm"
-            >
-              <button
-                class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors"
-              >
+        <section id="iluminacao" class="section-content space-y-4 md:space-y-6">
+            <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+              <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                 <div class="flex items-center gap-3">
-                  <span
-                    class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50"
-                    >T-60</span
-                  >
-                  <span class="text-base md:text-lg text-white">Pré-Culto</span>
+                  <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50">T-60</span>
+                  <span class="text-base md:text-lg text-white">Luz: Pré-Culto</span>
                 </div>
                 <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
               </button>
-              <div
-                class="accordion-content border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3 md:space-y-4"
-              >
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="luz-computador"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="60"
-                  />
+              <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                  <input type="checkbox" id="luz-computador" class="firebase-sync mt-0.5 md:mt-0" data-offset="60" />
                   <div class="ml-3 flex-1">
-                    <label
-                      for="luz-computador"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Ligar computador iluminação</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
+                    <label for="luz-computador" class="text-sm md:text-base font-semibold text-white block">
+                        Ligar computador iluminação
+                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                    </label>
+                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
+                  <button onclick="abrirModalInfo('luz-computador')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
 
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="luz-software"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="55"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="luz-software"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Iniciar o software GrandMA2</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="luz-software" class="firebase-sync mt-0.5 md:mt-0" data-offset="55" />
+                    <div class="ml-3 flex-1">
+                      <label for="luz-software" class="text-sm md:text-base font-semibold text-white block">
+                          Iniciar GrandMA2
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('luz-software')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
-                </div>
 
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="luz-radio"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="45"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="luz-radio"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Rádio para comunicação com projeção</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
+              </div>
+            </div>
+        </section>
+
+        <section id="transmissao" class="section-content space-y-4 md:space-y-6 hidden">
+             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-90</span>
+                    <span class="text-base md:text-lg text-white">Vídeo: Pré-Culto</span>
+                  </div>
+                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+                </button>
+                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
+                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="90" />
+                    <div class="ml-3 flex-1">
+                      <label for="trans-1" class="text-sm md:text-base font-semibold text-white block">
+                          Ligar Switcher
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('trans-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
                 </div>
               </div>
-            </div>
+        </section>
 
-            <!-- T-45min -->
-            <div
-              class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm"
-            >
-              <button
-                class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors"
-              >
-                <div class="flex items-center gap-3">
-                  <span
-                    class="text-[10px] bg-orange-900/20 text-orange-400 px-2 py-1 rounded font-mono border border-orange-900/30"
-                    >T-45</span
-                  >
-                  <span class="text-base md:text-lg text-white"
-                    >Checklist Aparelhos</span
-                  >
-                </div>
-                <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
-              </button>
-              <div
-                class="accordion-content border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3 md:space-y-4"
-              >
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="luz-teste-lampadas"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="45"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="luz-teste-lampadas"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Teste de Lâmpadas</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
-                  </div>
-                </div>
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="luz-preparar-haze"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="30"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="luz-preparar-haze"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Preparar Haze/Fumo</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section
-            id="transmissao"
-            class="section-content space-y-4 md:space-y-6 hidden"
-          >
-            <div
-              class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm"
-            >
-              <button
-                class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors"
-              >
-                <div class="flex items-center gap-3">
-                  <span
-                    class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50"
-                    >T-90</span
-                  >
-                  <span class="text-base md:text-lg text-white"
-                    >Engenharia de Vídeo</span
-                  >
-                </div>
-                <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
-              </button>
-              <div
-                class="accordion-content border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3 md:space-y-4"
-              >
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="trans-1"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="90"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="trans-1"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Ligar Switcher e Multiview</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
-                  </div>
-                </div>
-                <div
-                  class="task-item flex items-start md:items-center p-2 rounded-lg active:bg-gray-800/50 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    id="trans-2"
-                    class="cloud-sync mt-0.5 md:mt-0"
-                    data-offset="60"
-                  />
-                  <div class="ml-3 flex-1">
-                    <label
-                      for="trans-2"
-                      class="text-sm md:text-base font-semibold text-white block leading-tight"
-                      >Teste Sincronismo A/V</label
-                    >
-                    <span
-                      class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block"
-                      >--:--</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
       </div>
     </main>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-      import {
-        getAuth,
-        signInAnonymously,
-        onAuthStateChanged,
-      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-      import {
-        getFirestore,
-        doc,
-        setDoc,
-        onSnapshot,
-        collection,
-        deleteDoc,
-      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+      import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
@@ -543,247 +262,200 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      const appId =
-        typeof __app_id !== "undefined" ? __app_id : "checklist-bblk";
 
-      let operatorName = localStorage.getItem("op_name_v2") || "";
-      let selectedTime = localStorage.getItem("service_time") || "18:00";
+      // ESTADO
+      let userRole = "iluminacao"; // valor padrão
+      let userName = "";
+      let serviceTime = "18:00";
+      let docId = "";
 
-      // REGISTO DO SW
-      if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/Checklist-BBLK/service-worker.js', {
-        scope: '/Checklist-BBLK/',
-      })
-      .then(reg => {
-        console.log('✅ SW registrado:', reg.scope);
-      })
-      .catch(err => {
-        console.error('❌ Erro ao registrar SW:', err);
+      // UI LOGIN
+      const roleSelect = document.getElementById("role-select");
+      const adminPassContainer = document.getElementById("admin-pass-container");
+      
+      roleSelect.addEventListener("change", (e) => {
+        if(e.target.value === 'admin') {
+            adminPassContainer.classList.remove("hidden");
+        } else {
+            adminPassContainer.classList.add("hidden");
+        }
       });
-  });
-}
 
+      document.getElementById("start-app-btn").onclick = async () => {
+        const nameInput = document.getElementById("user-name-input").value.trim();
+        const selectedRole = roleSelect.value;
+        const pass = document.getElementById("admin-pass-input").value;
+        
+        if (!nameInput) return alert("Digite seu nome.");
+        
+        // Validação Admin
+        if (selectedRole === 'admin') {
+            if (pass !== "admin123") return alert("Senha incorreta!");
+            userRole = "admin";
+        } else {
+            userRole = selectedRole;
+        }
 
-      // --- LÓGICA DE HORÁRIOS ---
-      const sidebarSelect = document.getElementById("sidebar-service-select");
-      const modalSelect = document.getElementById("modal-service-select");
+        userName = nameInput;
+        serviceTime = document.getElementById("modal-service-select").value;
+        
+        // Cria ID único para o culto do dia
+        const today = new Date().toISOString().split('T')[0];
+        docId = `${today}_${serviceTime.replace(':','-')}`;
 
-      sidebarSelect.value = selectedTime;
-      modalSelect.value = selectedTime;
+        try {
+            document.getElementById("start-app-btn").innerText = "Carregando...";
+            await signInAnonymously(auth);
+        } catch (error) {
+            console.error(error);
+            alert("Erro de conexão.");
+        }
+      };
 
-      function updateServiceTime(newTime) {
-        selectedTime = newTime;
-        localStorage.setItem("service_time", newTime);
-        sidebarSelect.value = newTime;
-        modalSelect.value = newTime;
-        document.getElementById(
-          "display-service-time"
-        ).innerText = `Culto: ${newTime}`;
+      onAuthStateChanged(auth, (user) => {
+        if (user && userName) {
+            document.getElementById("login-modal").classList.add("hidden");
+            setupInterface();
+            connectDB();
+        }
+      });
+
+      // CONFIGURA A VISIBILIDADE BASEADA NO CARGO
+      function setupInterface() {
+        document.getElementById("display-service-time").innerText = `Culto: ${serviceTime}`;
+        document.getElementById("sidebar-user-name").innerText = userName;
+        document.getElementById("display-role-title").innerText = userRole.toUpperCase();
+        document.getElementById("role-badge").innerText = userRole === 'admin' ? 'ADMINISTRADOR' : 'OPERADOR';
+        
+        // Lógica de Visão Independente
+        const allSections = document.querySelectorAll('.section-content');
+        const allNavBtns = document.querySelectorAll('.nav-link');
+
+        if (userRole === 'admin') {
+            // Admin vê tudo
+            document.body.classList.add("show-tags");
+            document.getElementById("admin-controls").classList.remove("hidden");
+            // Mostra todos botões de navegação
+            allNavBtns.forEach(btn => btn.classList.remove('hidden-role'));
+        } else {
+            // Operador vê só o seu
+            allNavBtns.forEach(btn => {
+                // Se o ID do botão não contém o nome da role (ex: btn-nav-iluminacao contém iluminacao)
+                if (!btn.id.includes(userRole)) {
+                    btn.classList.add('hidden-role'); // Esconde botão na sidebar
+                } else {
+                    btn.click(); // Clica automaticamente no botão dele para abrir a aba certa
+                }
+            });
+            
+            // Força esconder seções que não são da role (segurança visual)
+            allSections.forEach(sec => {
+                if (sec.id !== userRole) sec.classList.add('hidden');
+            });
+        }
+      }
+
+      function connectDB() {
+        const sessionRef = doc(db, "ro_tec_sessions", docId);
+        
+        onSnapshot(sessionRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                updateCheckboxes(data.tasks || {});
+            } else {
+                setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
+            }
+        });
+
+        document.querySelectorAll(".firebase-sync").forEach(input => {
+            input.onchange = async (e) => {
+                const taskData = {
+                    checked: e.target.checked,
+                    user: e.target.checked ? userName : null,
+                    timestamp: new Date().toISOString()
+                };
+                await setDoc(sessionRef, { tasks: { [e.target.id]: taskData } }, { merge: true });
+            };
+        });
         recalculateDeadlines();
       }
 
-      sidebarSelect.onchange = (e) => updateServiceTime(e.target.value);
-      modalSelect.onchange = (e) => updateServiceTime(e.target.value);
+      function updateCheckboxes(tasksData) {
+        document.querySelectorAll(".firebase-sync").forEach(input => {
+            const task = tasksData[input.id];
+            if (task) {
+                input.checked = task.checked;
+                const tag = input.closest(".task-item").querySelector(".user-tag");
+                if (tag) {
+                    tag.innerText = task.user || "";
+                    tag.style.display = (userRole === 'admin' && task.checked) ? 'inline-block' : 'none';
+                }
+            } else {
+                input.checked = false;
+            }
+            input.closest(".task-item").classList.toggle("completed", input.checked);
+        });
+      }
+
+      // RESET (Admin)
+      const btnReset = document.getElementById("admin-reset-btn");
+      if(btnReset) {
+        btnReset.onclick = async () => {
+            if(confirm("Zerar checklist?")) {
+                const sessionRef = doc(db, "ro_tec_sessions", docId);
+                await updateDoc(sessionRef, { tasks: {} });
+            }
+        }
+      }
+
+      // MANUAIS & UI AUXILIAR
+      const MANUAL_INSTRUCOES = {
+        'luz-computador': { titulo: "Ligar PC", desc: "Senha: Luz. Ligar filtro de linha primeiro.", link: "" },
+        'trans-1': { titulo: "Switcher", desc: "Verificar cabos HDMI.", link: "" }
+      };
+
+      window.abrirModalInfo = (id) => {
+         const data = MANUAL_INSTRUCOES[id] || { titulo: "Info", desc: "Sem detalhes.", link: "" };
+         document.getElementById('info-title').innerText = data.titulo;
+         document.getElementById('info-desc').innerText = data.desc;
+         const l = document.getElementById('info-link');
+         data.link ? (l.href = data.link, l.classList.remove('hidden')) : l.classList.add('hidden');
+         document.getElementById('info-modal').classList.remove('hidden');
+         document.getElementById('info-modal').classList.add('flex');
+      };
+      window.fecharModalInfo = () => {
+         document.getElementById('info-modal').classList.add('hidden');
+         document.getElementById('info-modal').classList.remove('flex');
+      };
+
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.onclick = (e) => {
+            e.preventDefault();
+            // Se o usuário não for admin e tentar clicar em outra aba, ignora
+            if (userRole !== 'admin' && !link.id.includes(userRole)) return;
+            
+            document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+            link.classList.add("active");
+            document.querySelectorAll(".section-content").forEach(s => s.classList.add("hidden"));
+            document.getElementById(link.getAttribute("href").substring(1)).classList.remove("hidden");
+        }
+      });
+      
+      document.querySelectorAll(".accordion-toggle").forEach(btn => 
+        btn.onclick = () => btn.nextElementSibling.classList.toggle("open")
+      );
 
       function recalculateDeadlines() {
-        const now = new Date();
-        const [h, m] = selectedTime.split(":");
-        const serviceDate = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          h,
-          m,
-          0
-        );
-
-        document.querySelectorAll(".cloud-sync").forEach((input) => {
-          const offsetMinutes = parseInt(input.getAttribute("data-offset"));
-          const deadlineDate = new Date(
-            serviceDate.getTime() - offsetMinutes * 60000
-          );
-          const deadlineStr = deadlineDate.toLocaleTimeString("pt-PT", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          input.setAttribute("data-deadline", deadlineStr);
-          const label = input
-            .closest(".task-item")
-            .querySelector(".deadline-label");
-          if (label && !input.disabled) label.innerText = deadlineStr;
-        });
-        updateClock();
-      }
-
-      function updateClock() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString("pt-PT", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        if (document.getElementById("event-clock-desktop")) {
-          document.getElementById("event-clock-desktop").innerText = timeStr;
-        }
-
-        document.querySelectorAll(".cloud-sync").forEach((input) => {
-          const deadline = input.getAttribute("data-deadline");
-          if (deadline) {
-            const taskItem = input.closest(".task-item");
-            // MODIFICAÇÃO: Bloqueia se a hora passou, INDEPENDENTEMENTE de estar checkado ou não
-            if (timeStr > deadline) {
-              input.disabled = true;
-              taskItem.classList.add("expired");
-              const label = taskItem.querySelector(".deadline-label");
-              if (label)
-                label.innerHTML = `<i class="fas fa-lock mr-1"></i> BLOQUEADO (${deadline})`;
-            } else {
-              // Desbloqueia se estiver dentro do prazo
-              input.disabled = false;
-              taskItem.classList.remove("expired");
-              const label = taskItem.querySelector(".deadline-label");
-              if (label) label.innerText = deadline;
-            }
-          }
+        const [h, m] = serviceTime.split(":");
+        const serviceDate = new Date();
+        serviceDate.setHours(h, m, 0, 0);
+        document.querySelectorAll(".firebase-sync").forEach((input) => {
+          const offset = parseInt(input.getAttribute("data-offset"));
+          const d = new Date(serviceDate.getTime() - offset * 60000);
+          const lbl = input.closest(".task-item").querySelector(".deadline-label");
+          if (lbl) lbl.innerText = d.toLocaleTimeString("pt-PT", {hour:"2-digit", minute:"2-digit"});
         });
       }
-      setInterval(updateClock, 1000);
-
-      // --- AUTH & FIREBASE ---
-      onAuthStateChanged(auth, (user) => {
-        if (user && operatorName) {
-          document.getElementById("login-modal").classList.add("hidden");
-          initOperatorView();
-        } else if (!user) {
-          signInAnonymously(auth);
-        }
-      });
-
-      document.getElementById("start-app-btn").onclick = () => {
-        const name = document.getElementById("user-name-input").value.trim();
-        updateServiceTime(modalSelect.value);
-        if (name) {
-          operatorName = name;
-          localStorage.setItem("op_name_v2", name);
-          document.getElementById("login-modal").classList.add("hidden");
-          initOperatorView();
-        }
-      };
-
-      function initOperatorView() {
-        if (!auth.currentUser) return;
-        document.getElementById(
-          "display-operator-name"
-        ).innerText = `Op: ${operatorName}`;
-        document.getElementById(
-          "display-service-time"
-        ).innerText = `Culto: ${selectedTime}`;
-        recalculateDeadlines();
-
-        const docRef = doc(
-          db,
-          "artifacts",
-          appId,
-          "public",
-          "data",
-          "live_sessions",
-          auth.currentUser.uid
-        );
-
-        onSnapshot(docRef, (snap) => {
-          if (snap.exists()) {
-            const data = snap.data().tasks || {};
-            document.querySelectorAll(".cloud-sync").forEach((input) => {
-              input.checked = !!data[input.id];
-              input
-                .closest(".task-item")
-                .classList.toggle("completed", input.checked);
-            });
-          }
-        });
-
-        document.querySelectorAll(".cloud-sync").forEach((input) => {
-          input.onchange = async () => {
-            const tasks = {};
-            document
-              .querySelectorAll(".cloud-sync")
-              .forEach((i) => (tasks[i.id] = i.checked));
-            await setDoc(
-              docRef,
-              {
-                name: operatorName,
-                tasks,
-                lastUpdate: new Date().toISOString(),
-              },
-              { merge: true }
-            );
-          };
-        });
-      }
-
-      // --- RESET ---
-      document.getElementById("reset-session").onclick = async () => {
-        if (
-          confirm("Isto irá apagar os seus dados locais e na nuvem. Continuar?")
-        ) {
-          try {
-            localStorage.removeItem("op_name_v2");
-            localStorage.removeItem("service_time");
-
-            if (auth.currentUser) {
-              const docRef = doc(
-                db,
-                "artifacts",
-                appId,
-                "public",
-                "data",
-                "live_sessions",
-                auth.currentUser.uid
-              );
-              await deleteDoc(docRef);
-            }
-          } catch (error) {
-            console.error(
-              "Aviso: Limpeza da nuvem falhou, mas reset local foi feito.",
-              error
-            );
-          } finally {
-            window.location.reload();
-          }
-        }
-      };
-
-      document.querySelectorAll(".nav-link").forEach((link) => {
-        link.onclick = (e) => {
-          e.preventDefault();
-          const target = link.getAttribute("href").substring(1);
-
-          // Remove admin view toggle logic
-          document
-            .querySelectorAll(".nav-link")
-            .forEach((l) => l.classList.remove("active"));
-          link.classList.add("active");
-
-          document
-            .querySelectorAll(".section-content")
-            .forEach((s) => s.classList.add("hidden"));
-          const targetEl = document.getElementById(target);
-          if (targetEl) targetEl.classList.remove("hidden");
-        };
-      });
-
-      document
-        .querySelectorAll(".accordion-toggle")
-        .forEach(
-          (btn) =>
-            (btn.onclick = () =>
-              btn.nextElementSibling.classList.toggle("open"))
-        );
-
-      recalculateDeadlines();
     </script>
   </body>
 </html>
