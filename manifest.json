@@ -1,21 +1,21 @@
 {
   "name": "Roteiro Organizacional Técnico",
   "short_name": "RO-TEC",
-  "description": "Sistema de Gestão de Roteiros Técnicos para Transmissão e Iluminação.",
-  "start_url": "/Checklist-BBLK/",
+  "description": "Sistema de Gestão de Roteiros Técnicos.",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/Checklist-BBLK/icons/icon-192x192.png",
+      "src": "./icons/android-launchericon-192-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Checklist-BBLK/icons/icon-512x512.png",
+      "src": "./icons/android-launchericon-512-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

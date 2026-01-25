@@ -7,9 +7,10 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#111827" />
-    <title>RO-TEC | Online Sync</title>
+    <title>RO-TEC | System</title>
 
-    <link rel="manifest" href="/Checklist-BBLK/manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -113,6 +114,8 @@
             <select id="role-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
                 <option value="iluminacao">💡 Iluminação</option>
                 <option value="transmissao">🎥 Transmissão/Vídeo</option>
+                <option value="sonoplastia">🎚️ Sonoplastia</option>
+                <option value="projecao">📽️ Projeção</option>
                 <option value="admin">🛡️ Administrador Geral</option>
             </select>
             
@@ -145,9 +148,14 @@
         </div>
       </div>
 
-      <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4 hidden md:block">
-        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Operador:</div>
-        <div id="sidebar-user-name" class="text-white font-semibold truncate">...</div>
+      <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4 hidden md:flex items-center justify-between">
+        <div class="overflow-hidden">
+            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Operador:</div>
+            <div id="sidebar-user-name" class="text-white font-semibold truncate text-sm">...</div>
+        </div>
+        <button id="btn-logout" class="ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-colors border border-red-500/20" title="Trocar Função">
+            <i class="fas fa-right-from-bracket"></i>
+        </button>
       </div>
 
       <nav id="nav-container" class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -250,27 +258,27 @@
       import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+      // ⚠️ Substitua aqui pelas chaves do SEU novo projeto se ainda não fez!
       const firebaseConfig = {
-        // ... MANTENHA SUAS CHAVES AQUI ...
         apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
         authDomain: "checklist-bblk.firebaseapp.com",
         projectId: "checklist-bblk",
         storageBucket: "checklist-bblk.firebasestorage.app",
         messagingSenderId: "187345070674",
         appId: "1:187345070674:web:d3a203e3ad7cbe79a58d8b",
+        measurementId: "G-5GKJJ1NFDM"
       };
 
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // --- OTIMIZAÇÃO 1: BANCO DE DADOS OFFLINE ---
-      // Isso faz o checklist carregar instantâneo usando dados em cache
+      // --- PERSISTÊNCIA OFFLINE (Cache de Dados) ---
       enableIndexedDbPersistence(db).catch((err) => {
           if (err.code == 'failed-precondition') {
-              console.log('Múltiplas abas abertas, persistência habilitada apenas em uma.');
+              console.log('Múltiplas abas abertas.');
           } else if (err.code == 'unimplemented') {
-              console.log('Navegador não suporta persistência.');
+              console.log('Navegador sem suporte a persistência.');
           }
       });
 
@@ -279,7 +287,7 @@
       let userName = "";
       let serviceTime = "18:00";
       let docId = "";
-      let appReady = false; // Impede recarregamentos duplos
+      let appReady = false; // Evita loop de reload
 
       // UI LOGIN
       const roleSelect = document.getElementById("role-select");
@@ -293,7 +301,6 @@
         }
       });
 
-      // --- OTIMIZAÇÃO 2: LÓGICA DE LOGIN INTELIGENTE ---
       document.getElementById("start-app-btn").onclick = async () => {
         const nameInput = document.getElementById("user-name-input").value.trim();
         const selectedRole = roleSelect.value;
@@ -312,30 +319,25 @@
         userName = nameInput;
         serviceTime = document.getElementById("modal-service-select").value;
         
-        // Cria ID único para o culto do dia
         const today = new Date().toISOString().split('T')[0];
         docId = `${today}_${serviceTime.replace(':','-')}`;
 
         document.getElementById("start-app-btn").innerText = "Entrando...";
 
-        // A MÁGICA: Se já tem usuário, não espera a rede!
+        // Lógica Inteligente de Login
         if (auth.currentUser) {
-            console.log("Usuário já autenticado (Cache). Entrando instantaneamente.");
-            iniciarSistema(); 
+            iniciarSistema();
         } else {
-            console.log("Conectando ao servidor...");
             try {
                 await signInAnonymously(auth);
-                // O onAuthStateChanged vai chamar o iniciarSistema()
             } catch (error) {
                 console.error(error);
-                alert("Erro de conexão. Verifique sua internet.");
+                alert("Erro de conexão. Verifique a internet.");
                 document.getElementById("start-app-btn").innerText = "Tentar Novamente";
             }
         }
       };
 
-      // Monitora apenas a primeira conexão ou desconexões
       onAuthStateChanged(auth, (user) => {
         if (user && userName && !appReady) {
             iniciarSistema();
@@ -343,15 +345,19 @@
       });
 
       function iniciarSistema() {
-        if(appReady) return; // Evita rodar duas vezes
+        if(appReady) return;
         appReady = true;
 
         document.getElementById("login-modal").classList.add("hidden");
+        
+        // --- RESET VISUAL CRÍTICO PARA TROCA DE FUNÇÃO ---
+        // Garante que se você saiu de "Admin" e voltou como "Luz", o modo Admin suma.
+        document.body.className = "text-gray-200 flex flex-col md:flex-row fixed inset-0"; 
+        
         setupInterface();
         connectDB();
       }
 
-      // CONFIGURA A VISIBILIDADE BASEADA NO CARGO
       function setupInterface() {
         document.getElementById("display-service-time").innerText = `Culto: ${serviceTime}`;
         document.getElementById("sidebar-user-name").innerText = userName;
@@ -370,7 +376,7 @@
                 if (!btn.id.includes(userRole)) {
                     btn.classList.add('hidden-role');
                 } else {
-                    btn.click(); 
+                    btn.click(); // Auto-seleciona aba
                 }
             });
             allSections.forEach(sec => {
@@ -382,14 +388,11 @@
       function connectDB() {
         const sessionRef = doc(db, "ro_tec_sessions", docId);
         
-        // O snapshot agora usa cache local primeiro (graças ao enableIndexedDbPersistence)
         onSnapshot(sessionRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 updateCheckboxes(data.tasks || {});
             } else {
-                // Só tenta criar se for Admin ou se o doc realmente não existir
-                // Evita escritas desnecessárias de operadores
                 setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
             }
         });
@@ -401,7 +404,6 @@
                     user: e.target.checked ? userName : null,
                     timestamp: new Date().toISOString()
                 };
-                // Atualização Otimista: A UI já mudou, o Firebase sincroniza em background
                 await setDoc(sessionRef, { tasks: { [e.target.id]: taskData } }, { merge: true });
             };
         });
@@ -412,12 +414,10 @@
         document.querySelectorAll(".firebase-sync").forEach(input => {
             const task = tasksData[input.id];
             if (task) {
-                // Só atualiza visualmente se estiver diferente para evitar "flicker"
                 if (input.checked !== task.checked) {
                     input.checked = task.checked;
                     input.closest(".task-item").classList.toggle("completed", input.checked);
                 }
-                
                 const tag = input.closest(".task-item").querySelector(".user-tag");
                 if (tag) {
                     tag.innerText = task.user || "";
@@ -428,6 +428,20 @@
                 input.closest(".task-item").classList.remove("completed");
             }
         });
+      }
+
+      // --- LOGOUT / TROCA RÁPIDA ---
+      const btnLogout = document.getElementById("btn-logout");
+      if(btnLogout) {
+          btnLogout.onclick = () => {
+              appReady = false;
+              // Reseta UI básica
+              document.body.classList.remove("show-tags");
+              document.getElementById("admin-controls").classList.add("hidden");
+              // Abre Modal
+              document.getElementById("login-modal").classList.remove("hidden");
+              document.getElementById("start-app-btn").innerText = "Entrar";
+          }
       }
 
       // RESET (Admin)
@@ -441,7 +455,7 @@
         }
       }
 
-      // MANUAIS & UI AUXILIAR
+      // MANUAIS
       const MANUAL_INSTRUCOES = {
         'luz-computador': { titulo: "Ligar PC", desc: "Senha: Luz. Ligar filtro de linha primeiro.", link: "" },
         'trans-1': { titulo: "Switcher", desc: "Verificar cabos HDMI.", link: "" }
