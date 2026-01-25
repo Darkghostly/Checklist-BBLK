@@ -22,7 +22,6 @@
     />
 
     <style>
-      /* --- ESTILOS GERAIS --- */
       html, body {
         height: 100%; width: 100%; overflow: hidden;
         overscroll-behavior: none; background-color: #111827;
@@ -31,13 +30,10 @@
       #main-scroll-area { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
       
       .task-item.completed label { text-decoration: line-through; color: #6b7280; }
-      .task-item.just-updated { animation: highlightPulse 2s ease-out; }
-      @keyframes highlightPulse {
-        0% { background-color: rgba(59, 130, 246, 0.3); }
-        100% { background-color: transparent; }
-      }
-      .task-item.expired { opacity: 0.6; border-color: #374151; background-color: #1f293780; }
-      .task-item.expired label { color: #6b7280; cursor: not-allowed; }
+      
+      /* Efeito de Bloqueio */
+      .task-item.expired { opacity: 0.5; background-color: rgba(31, 41, 55, 0.5); border: 1px solid #374151; }
+      .task-item.expired label { cursor: not-allowed; color: #6b7280; }
       .task-item.expired .deadline-label { color: #ef4444; font-weight: bold; }
       
       .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
@@ -56,9 +52,20 @@
         content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
         color: white; font-size: 0.8rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       }
+      /* Estilo quando desabilitado/bloqueado */
+      input[type="checkbox"]:disabled {
+          cursor: not-allowed;
+          border-color: #4b5563;
+          background-color: #111827;
+          opacity: 0.5;
+      }
       
-      .user-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; text-transform: uppercase; font-weight: bold; display: none; }
-      .show-tags .user-tag { display: inline-block; }
+      .user-tag { 
+          font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; margin-left: 8px; 
+          text-transform: uppercase; font-weight: bold; display: none; align-items: center; white-space: nowrap; 
+      }
+      .show-tags .user-tag { display: inline-flex; }
+      input[type="date"] { color-scheme: dark; }
     </style>
   </head>
   <body class="text-gray-200 flex flex-col md:flex-row fixed inset-0">
@@ -67,15 +74,12 @@
         <div class="bg-gray-900 border border-gray-700 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative">
             <div class="flex justify-between items-start p-6 border-b border-gray-800 bg-gray-800/50">
                 <h3 id="info-title" class="text-xl font-bold text-white pr-4">Título</h3>
-                <button onclick="fecharModalInfo()" class="text-gray-500 hover:text-white transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <button onclick="fecharModalInfo()" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="p-6">
                 <p id="info-desc" class="text-gray-300 leading-relaxed text-sm md:text-base mb-6">Descrição...</p>
                 <a id="info-link" href="#" target="_blank" class="flex items-center justify-center w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-900/20 group">
-                    <i class="fab fa-youtube text-xl mr-3 group-hover:scale-110 transition-transform"></i>
-                    Assistir Video Tutorial
+                    <i class="fab fa-youtube text-xl mr-3 group-hover:scale-110 transition-transform"></i> Assistir Video Tutorial
                 </a>
                 <p id="no-link-msg" class="text-center text-gray-600 text-xs mt-2 hidden">* Nenhum tutorial disponível.</p>
             </div>
@@ -94,7 +98,6 @@
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
             <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
         </div>
-
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto / Evento</label>
             <select id="modal-service-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
@@ -103,7 +106,6 @@
             <option value="20:00">Quinta Feira (20h)</option>
             </select>
         </div>
-
         <div class="mb-6">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Sua Função Hoje</label>
             <select id="role-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
@@ -112,12 +114,10 @@
                 <option value="projecao">📽️ Projeção</option>
                 <option value="admin">🛡️ Administrador Geral</option>
             </select>
-            
             <div id="admin-pass-container" class="hidden mt-3">
                 <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
             </div>
         </div>
-
         <button id="start-app-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">Entrar</button>
       </div>
     </div>
@@ -133,15 +133,20 @@
             <span id="role-badge" class="text-[10px] text-gray-500 font-medium block">...</span>
           </div>
         </div>
-        
         <div class="flex items-center gap-2">
             <div class="flex items-center text-[10px] text-emerald-500 font-bold tracking-widest uppercase bg-emerald-900/10 px-2 py-1 rounded-full border border-emerald-900/20">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span> Sync
             </div>
-            <button class="logout-btn md:hidden bg-red-500/10 text-red-400 p-2 rounded-lg border border-red-500/20 active:scale-90 transition-transform" title="Sair">
-                <i class="fas fa-right-from-bracket"></i>
-            </button>
+            <button class="logout-btn md:hidden bg-red-500/10 text-red-400 p-2 rounded-lg border border-red-500/20 active:scale-90 transition-transform" title="Sair"><i class="fas fa-right-from-bracket"></i></button>
         </div>
+      </div>
+
+      <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-2">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-[10px] text-gray-500 uppercase font-bold">Data (Histórico):</label>
+            <i id="lock-icon" class="fas fa-lock text-gray-600 text-xs" title="Bloqueado para Operadores"></i>
+          </div>
+          <input type="date" id="history-date-input" class="bg-gray-900 text-white text-sm p-2 rounded-lg border border-gray-700 outline-none w-full cursor-not-allowed opacity-70" disabled />
       </div>
 
       <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4 hidden md:flex items-center justify-between">
@@ -149,9 +154,7 @@
             <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Operador:</div>
             <div id="sidebar-user-name" class="text-white font-semibold truncate text-sm">...</div>
         </div>
-        <button class="logout-btn ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-colors border border-red-500/20" title="Trocar Função">
-            <i class="fas fa-right-from-bracket"></i>
-        </button>
+        <button class="logout-btn ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-colors border border-red-500/20" title="Trocar Função"><i class="fas fa-right-from-bracket"></i></button>
       </div>
 
       <nav id="nav-container" class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -167,27 +170,21 @@
       </nav>
       
       <div class="mt-auto w-full space-y-3 pt-4 hidden md:block">
-          
-          <a href="https://youtube.com/playlist?list=SEU_LINK_DA_PLAYLIST" target="_blank" class="flex items-center w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-900/20 group cursor-pointer relative overflow-hidden">
+          <a href="https://youtube.com/playlist?list=SEU_LINK" target="_blank" class="flex items-center w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-900/20 group cursor-pointer relative overflow-hidden">
              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-             
-             <div class="bg-white/20 p-2 rounded-lg mr-3">
-                <i class="fab fa-youtube text-white text-lg"></i>
-             </div>
+             <div class="bg-white/20 p-2 rounded-lg mr-3"><i class="fab fa-youtube text-white text-lg"></i></div>
              <div class="flex-1 text-left">
                  <div class="text-[10px] uppercase font-bold text-blue-200 tracking-wider">Treinamento</div>
                  <div class="text-sm font-bold">Vídeo Tutorial</div>
              </div>
              <i class="fas fa-external-link-alt text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
           </a>
-
           <div id="admin-controls" class="hidden">
             <button id="admin-reset-btn" class="w-full border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
                 <i class="fas fa-trash-arrow-up mr-2"></i> Resetar Tudo
             </button>
           </div>
       </div>
-
     </aside>
 
     <main id="main-scroll-area" class="flex-1 overflow-y-auto bg-gray-950 relative w-full">
@@ -196,9 +193,7 @@
             <div>
               <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Checklist</h1>
               <div class="flex items-center gap-3 mt-1">
-                <span id="display-date-badge" class="text-orange-300 text-[10px] font-bold uppercase tracking-widest bg-orange-900/20 px-2 py-0.5 rounded border border-orange-900/30">
-                    <i class="far fa-calendar-alt mr-1"></i> --/--
-                </span>
+                <span id="display-date-badge" class="text-orange-300 text-[10px] font-bold uppercase tracking-widest bg-orange-900/20 px-2 py-0.5 rounded border border-orange-900/30"><i class="far fa-calendar-alt mr-1"></i> --/--</span>
                 <span id="display-service-time" class="text-blue-400 text-[10px] font-bold uppercase tracking-widest bg-blue-900/20 px-2 py-0.5 rounded border border-blue-900/30">--:--</span>
                 <span id="display-role-title" class="text-gray-500 text-[10px] font-bold uppercase tracking-widest hidden md:inline-block">Geral</span>
               </div>
@@ -301,7 +296,6 @@
                </div>
              </div>
        </section>
-
       </div>
     </main>
 
@@ -310,7 +304,6 @@
       import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      // ⚠️ MANTENHA SUAS CHAVES AQUI
       const firebaseConfig = {
         apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
         authDomain: "checklist-bblk.firebaseapp.com",
@@ -329,23 +322,23 @@
           else if (err.code == 'unimplemented') console.log('Sem persistência.');
       });
 
-      // --- CORREÇÃO: Recupera a Role do LocalStorage ou usa o padrão ---
       let userRole = localStorage.getItem("rotec_role") || "iluminacao";
-      
       let userName = "";
       let serviceTime = "18:00";
       let docId = "";
       let appReady = false;
+      let unsubscribeSnapshot = null; 
+
+      const historyDateInput = document.getElementById("history-date-input");
+      const lockIcon = document.getElementById("lock-icon");
+      const todayISO = new Date().toISOString().split('T')[0];
+      historyDateInput.value = todayISO;
 
       const roleSelect = document.getElementById("role-select");
       const adminPassContainer = document.getElementById("admin-pass-container");
-      
       roleSelect.addEventListener("change", (e) => {
-        if(e.target.value === 'admin') {
-            adminPassContainer.classList.remove("hidden");
-        } else {
-            adminPassContainer.classList.add("hidden");
-        }
+        if(e.target.value === 'admin') adminPassContainer.classList.remove("hidden");
+        else adminPassContainer.classList.add("hidden");
       });
 
       document.getElementById("start-app-btn").onclick = async () => {
@@ -354,61 +347,38 @@
         const pass = document.getElementById("admin-pass-input").value;
         
         if (!nameInput) return alert("Digite seu nome.");
-        
         if (selectedRole === 'admin') {
             if (pass !== "admin123") return alert("Senha incorreta!");
             userRole = "admin";
         } else {
             userRole = selectedRole;
         }
-
-        // --- CORREÇÃO: Salva a Role no Navegador ---
         localStorage.setItem("rotec_role", userRole);
-
         userName = nameInput;
         serviceTime = document.getElementById("modal-service-select").value;
-        
-        const today = new Date().toISOString().split('T')[0];
-        docId = `${today}_${serviceTime.replace(':','-')}`;
-
         document.getElementById("start-app-btn").innerText = "Entrando...";
 
-        if (auth.currentUser) {
-            iniciarSistema();
-        } else {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error(error);
-                alert("Erro de conexão.");
-                document.getElementById("start-app-btn").innerText = "Tentar Novamente";
-            }
+        if (auth.currentUser) iniciarSistema();
+        else {
+            try { await signInAnonymously(auth); } 
+            catch (error) { console.error(error); alert("Erro de conexão."); document.getElementById("start-app-btn").innerText = "Tentar Novamente"; }
         }
       };
 
       onAuthStateChanged(auth, (user) => {
-        if (user && userName && !appReady) {
-            iniciarSistema();
-        }
+        if (user && userName && !appReady) iniciarSistema();
       });
 
       function iniciarSistema() {
         if(appReady) return;
         appReady = true;
-
         document.getElementById("login-modal").classList.add("hidden");
         document.body.className = "text-gray-200 flex flex-col md:flex-row fixed inset-0"; 
-        
         setupInterface();
-        connectDB();
+        connectDB(); 
       }
 
       function setupInterface() {
-        // DATA
-        const dateOptions = { weekday: 'long', day: '2-digit', month: '2-digit' };
-        const dateStr = new Date().toLocaleDateString('pt-BR', dateOptions);
-        document.getElementById("display-date-badge").innerHTML = `<i class="far fa-calendar-alt mr-1"></i> ${dateStr}`;
-
         document.getElementById("display-service-time").innerText = `Culto: ${serviceTime}`;
         document.getElementById("sidebar-user-name").innerText = userName;
         document.getElementById("display-role-title").innerText = userRole.toUpperCase();
@@ -418,54 +388,79 @@
         const allNavBtns = document.querySelectorAll('.nav-link');
 
         if (userRole === 'admin') {
+            historyDateInput.disabled = false;
+            historyDateInput.classList.remove("cursor-not-allowed", "opacity-70");
+            historyDateInput.classList.add("cursor-pointer", "border-blue-500", "text-blue-300");
+            lockIcon.className = "fas fa-unlock text-blue-500 text-xs";
+            lockIcon.title = "Modo Histórico Ativo";
+            
+            historyDateInput.onchange = (e) => { if(e.target.value) connectDB(e.target.value); };
+
             document.body.classList.add("show-tags");
             document.getElementById("admin-controls").classList.remove("hidden");
             allNavBtns.forEach(btn => btn.classList.remove('hidden-role'));
             
-            // Corrige bug do admin ver tela preta inicial
             if(document.querySelector('.section-content:not(.hidden)') === null) {
                  document.getElementById('iluminacao').classList.remove('hidden');
                  document.getElementById('btn-nav-iluminacao').classList.add('active');
             }
         } else {
+            historyDateInput.value = todayISO; 
+            historyDateInput.disabled = true;
+            historyDateInput.classList.add("cursor-not-allowed", "opacity-70");
+            lockIcon.className = "fas fa-lock text-gray-600 text-xs";
+            
             document.body.classList.remove("show-tags");
             document.getElementById("admin-controls").classList.add("hidden");
 
-            // --- CORREÇÃO: Força a exibição correta baseada na Role Salva ---
             allNavBtns.forEach(btn => {
-                if (btn.id.includes(userRole)) {
-                    btn.classList.remove('hidden-role');
-                    btn.classList.add('active'); 
-                } else {
-                    btn.classList.add('hidden-role');
-                    btn.classList.remove('active');
-                }
+                if (btn.id.includes(userRole)) { btn.classList.remove('hidden-role'); btn.classList.add('active'); } 
+                else { btn.classList.add('hidden-role'); btn.classList.remove('active'); }
             });
-
             allSections.forEach(sec => {
-                if (sec.id === userRole) {
-                    sec.classList.remove('hidden');
-                } else {
-                    sec.classList.add('hidden');
-                }
+                if (sec.id === userRole) sec.classList.remove('hidden'); else sec.classList.add('hidden');
             });
         }
+        updateDateBadge(historyDateInput.value);
+        recalculateDeadlines(); // Inicia relógio
       }
 
-      function connectDB() {
+      function updateDateBadge(dateValue) {
+          const [y, m, d] = dateValue.split('-');
+          const dateObj = new Date(y, m - 1, d);
+          const dateOptions = { weekday: 'long', day: '2-digit', month: '2-digit' };
+          document.getElementById("display-date-badge").innerHTML = `<i class="far fa-calendar-alt mr-1"></i> ${dateObj.toLocaleDateString('pt-BR', dateOptions)}`;
+      }
+
+      function connectDB(specificDate = null) {
+        if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+        const dateToUse = specificDate || todayISO;
+        docId = `${dateToUse}_${serviceTime.replace(':','-')}`;
+        updateDateBadge(dateToUse);
+
+        // Limpa a tela antes de carregar o novo dia (Corrige o BUG DE ATUALIZAÇÃO)
+        updateCheckboxes({}); 
+
         const sessionRef = doc(db, "ro_tec_sessions", docId);
-        
-        onSnapshot(sessionRef, (docSnap) => {
+        unsubscribeSnapshot = onSnapshot(sessionRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 updateCheckboxes(data.tasks || {});
             } else {
-                setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
+                if (dateToUse === todayISO) setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
+                else updateCheckboxes({}); // Garante limpeza se dia for vazio
             }
         });
 
         document.querySelectorAll(".firebase-sync").forEach(input => {
             input.onchange = async (e) => {
+                // Bloqueia edição em datas passadas (exceto Admin)
+                if (dateToUse !== todayISO && userRole !== 'admin') {
+                    alert("Histórico é apenas leitura!");
+                    e.target.checked = !e.target.checked;
+                    return;
+                }
                 const taskData = {
                     checked: e.target.checked,
                     user: e.target.checked ? userName : null,
@@ -487,37 +482,80 @@
                 }
                 const tag = input.closest(".task-item").querySelector(".user-tag");
                 if (tag) {
-                    tag.innerText = task.user || "";
-                    tag.style.display = (userRole === 'admin' && task.checked) ? 'inline-block' : 'none';
+                    if (userRole === 'admin' && task.checked && task.timestamp) {
+                        const dateObj = new Date(task.timestamp);
+                        const timeStr = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        const dateStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                        tag.innerHTML = `${task.user} <span class="opacity-60 font-normal ml-2 border-l border-blue-500/50 pl-2 text-[9px] tracking-normal">${dateStr} ${timeStr}</span>`;
+                        tag.style.display = 'inline-flex';
+                    } else if (userRole === 'admin' && task.checked) {
+                        tag.innerText = task.user || "ANÔNIMO";
+                        tag.style.display = 'inline-flex';
+                    } else { tag.style.display = 'none'; }
                 }
             } else {
                 input.checked = false;
                 input.closest(".task-item").classList.remove("completed");
+                const tag = input.closest(".task-item").querySelector(".user-tag");
+                if(tag) tag.style.display = 'none';
             }
         });
       }
 
+      // --- RELÓGIO DE BLOQUEIO (Correção do BUG DE BLOQUEIO) ---
+      setInterval(() => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+        const isToday = historyDateInput.value === todayISO;
+
+        document.querySelectorAll(".firebase-sync").forEach((input) => {
+          const deadline = input.getAttribute("data-deadline");
+          if (!deadline) return;
+
+          const taskItem = input.closest(".task-item");
+          const label = taskItem.querySelector(".deadline-label");
+          
+          // Lógica: Se passou da hora E é hoje E usuário não é admin
+          if (timeStr > deadline && isToday && userRole !== 'admin') {
+             // Só bloqueia se não estiver marcado (opcional, ou bloqueia tudo)
+             // Aqui bloqueio tudo para editar, mas visualmente mostra checked se tiver
+             input.disabled = true; 
+             taskItem.classList.add("expired");
+             if (label && !input.checked) label.innerHTML = `<i class="fas fa-lock mr-1"></i> ${deadline}`;
+          } else if (!isToday && userRole !== 'admin') {
+             // Bloqueia dias passados/futuros para operadores
+             input.disabled = true;
+          } else {
+             // Libera
+             input.disabled = false;
+             taskItem.classList.remove("expired");
+             if (label) label.innerText = deadline;
+          }
+        });
+      }, 1000);
+
       document.querySelectorAll(".logout-btn").forEach(btn => {
           btn.onclick = () => {
               appReady = false;
+              if (unsubscribeSnapshot) unsubscribeSnapshot(); 
               document.body.classList.remove("show-tags");
               document.getElementById("admin-controls").classList.add("hidden");
               document.getElementById("login-modal").classList.remove("hidden");
               document.getElementById("start-app-btn").innerText = "Entrar";
+              historyDateInput.value = todayISO;
           }
       });
 
       const btnReset = document.getElementById("admin-reset-btn");
       if(btnReset) {
         btnReset.onclick = async () => {
-            if(confirm("Zerar checklist?")) {
+            if(confirm("ATENÇÃO: Isso apagará os dados da data selecionada!")) {
                 const sessionRef = doc(db, "ro_tec_sessions", docId);
                 await updateDoc(sessionRef, { tasks: {} });
             }
         }
       }
 
-      // MANUAIS
       const MANUAL_INSTRUCOES = {
         'luz-computador': { titulo: "Ligar PC", desc: "Senha: Luz. Ligar filtro de linha primeiro.", link: "" },
         'trans-1': { titulo: "Switcher", desc: "Verificar cabos HDMI.", link: "" },
@@ -530,23 +568,12 @@
          document.getElementById('info-desc').innerText = data.desc;
          const l = document.getElementById('info-link');
          const noLinkMsg = document.getElementById('no-link-msg');
-         
-         if(data.link) {
-            l.href = data.link; 
-            l.classList.remove('hidden');
-            noLinkMsg.classList.add('hidden');
-         } else {
-            l.classList.add('hidden');
-            noLinkMsg.classList.remove('hidden');
-         }
-         
+         if(data.link) { l.href = data.link; l.classList.remove('hidden'); noLinkMsg.classList.add('hidden'); } 
+         else { l.classList.add('hidden'); noLinkMsg.classList.remove('hidden'); }
          document.getElementById('info-modal').classList.remove('hidden');
          document.getElementById('info-modal').classList.add('flex');
       };
-      window.fecharModalInfo = () => {
-         document.getElementById('info-modal').classList.add('hidden');
-         document.getElementById('info-modal').classList.remove('flex');
-      };
+      window.fecharModalInfo = () => { document.getElementById('info-modal').classList.add('hidden'); document.getElementById('info-modal').classList.remove('flex'); };
 
       document.querySelectorAll(".nav-link").forEach(link => {
         link.onclick = (e) => {
@@ -559,9 +586,7 @@
         }
       });
       
-      document.querySelectorAll(".accordion-toggle").forEach(btn => 
-        btn.onclick = () => btn.nextElementSibling.classList.toggle("open")
-      );
+      document.querySelectorAll(".accordion-toggle").forEach(btn => btn.onclick = () => btn.nextElementSibling.classList.toggle("open"));
 
       function recalculateDeadlines() {
         const [h, m] = serviceTime.split(":");
@@ -570,8 +595,7 @@
         document.querySelectorAll(".firebase-sync").forEach((input) => {
           const offset = parseInt(input.getAttribute("data-offset"));
           const d = new Date(serviceDate.getTime() - offset * 60000);
-          const lbl = input.closest(".task-item").querySelector(".deadline-label");
-          if (lbl) lbl.innerText = d.toLocaleTimeString("pt-PT", {hour:"2-digit", minute:"2-digit"});
+          input.setAttribute("data-deadline", d.toLocaleTimeString("pt-PT", {hour:"2-digit", minute:"2-digit"}));
         });
       }
     </script>
