@@ -31,7 +31,6 @@
       
       .task-item.completed label { text-decoration: line-through; color: #6b7280; }
       
-      /* Efeito de Bloqueio */
       .task-item.expired { opacity: 0.5; background-color: rgba(31, 41, 55, 0.5); border: 1px solid #374151; }
       .task-item.expired label { cursor: not-allowed; color: #6b7280; }
       .task-item.expired .deadline-label { color: #ef4444; font-weight: bold; }
@@ -52,7 +51,6 @@
         content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
         color: white; font-size: 0.8rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       }
-      /* Estilo quando desabilitado/bloqueado */
       input[type="checkbox"]:disabled {
           cursor: not-allowed;
           border-color: #4b5563;
@@ -91,31 +89,31 @@
         <div class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mb-4 mx-auto">
             <i class="fas fa-user-shield text-blue-500 text-xl"></i>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1 text-center">Acesso RO-TEC</h2>
+        <h2 class="text-xl font-bold text-white mb-1 text-center">Acesso Relatório de Culto</h2>
         <p class="text-gray-400 mb-6 text-xs text-center">Selecione sua função para hoje</p>
         
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
-            <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
+            <input type="text" id="user-name-input" placeholder="Nome" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
         </div>
         <div class="mb-3">
-            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto / Evento</label>
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto</label>
             <select id="modal-service-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
-            <option value="10:00">Domingo Manhã (10h)</option>
-            <option value="18:00" selected>Domingo Noite (18h)</option>
-            <option value="20:00">Quinta Feira (20h)</option>
+            <option value="10:00">Celebração em Família Manhã (10h)</option>
+            <option value="18:00" selected>Celebração em Família Noite (18h)</option>
+            <option value="20:00">Reaviva (20h)</option>
             </select>
         </div>
         <div class="mb-6">
-            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Sua Função Hoje</label>
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Função do Dia</label>
             <select id="role-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
                 <option value="iluminacao">💡 Iluminação</option>
                 <option value="transmissao">🎥 Transmissão/Vídeo</option>
                 <option value="projecao">📽️ Projeção</option>
-                <option value="admin">🛡️ Administrador Geral</option>
+                <option value="admin">🛡️ Administrador</option>
             </select>
             <div id="admin-pass-container" class="hidden mt-3">
-                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
+                <input type="password" id="admin-pass-input" placeholder="Senha" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
             </div>
         </div>
         <button id="start-app-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">Entrar</button>
@@ -129,7 +127,7 @@
             <i class="fas fa-satellite-dish text-white text-xs md:text-base"></i>
           </div>
           <div>
-            <h1 class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none">RO-TEC</h1>
+            <h1 class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none">Relatório de Culto</h1>
             <span id="role-badge" class="text-[10px] text-gray-500 font-medium block">...</span>
           </div>
         </div>
@@ -144,7 +142,7 @@
       <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-2">
           <div class="flex items-center justify-between mb-2">
             <label class="text-[10px] text-gray-500 uppercase font-bold">Data (Histórico):</label>
-            <i id="lock-icon" class="fas fa-lock text-gray-600 text-xs" title="Bloqueado para Operadores"></i>
+            <i id="lock-icon" class="fas fa-lock text-gray-600 text-xs" title="Apenas Administrador"></i>
           </div>
           <input type="date" id="history-date-input" class="bg-gray-900 text-white text-sm p-2 rounded-lg border border-gray-700 outline-none w-full cursor-not-allowed opacity-70" disabled />
       </div>
@@ -170,11 +168,11 @@
       </nav>
       
       <div class="mt-auto w-full space-y-3 pt-4 hidden md:block">
-          <a href="https://youtube.com/playlist?list=SEU_LINK" target="_blank" class="flex items-center w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-900/20 group cursor-pointer relative overflow-hidden">
+          <a href="https://www.youtube.com/@B%C3%ADblicaVida" target="_blank" class="flex items-center w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-red-900/20 group cursor-pointer relative overflow-hidden">
              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
              <div class="bg-white/20 p-2 rounded-lg mr-3"><i class="fab fa-youtube text-white text-lg"></i></div>
              <div class="flex-1 text-left">
-                 <div class="text-[10px] uppercase font-bold text-blue-200 tracking-wider">Treinamento</div>
+                 <div class="text-[10px] uppercase font-bold text-red-200 tracking-wider">Treinamento</div>
                  <div class="text-sm font-bold">Vídeo Tutorial</div>
              </div>
              <i class="fas fa-external-link-alt text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
@@ -201,26 +199,29 @@
         </header>
 
         <section id="iluminacao" class="section-content space-y-4 md:space-y-6">
+          <!-- Inicialização -->            
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
               <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                 <div class="flex items-center gap-3">
-                  <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded font-mono border border-blue-900/50">T-60</span>
-                  <span class="text-base md:text-lg text-white">Luz: Pré-Culto</span>
+                  <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-60</span>
+                  <span class="text-base md:text-lg text-white">Inicialização</span>
                 </div>
                 <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
               </button>
               <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                <!-- luz-1 -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
-                  <input type="checkbox" id="luz-computador" class="firebase-sync mt-0.5 md:mt-0" data-offset="60" />
+                  <input type="checkbox" id="luz-1" class="firebase-sync mt-0.5 md:mt-0" data-offset="60" />
                   <div class="ml-3 flex-1">
-                    <label for="luz-computador" class="text-sm md:text-base font-semibold text-white block">
-                        Ligar computador iluminação
+                    <label for="luz-1" class="text-sm md:text-base font-semibold text-white block">
+                        Ligar Filtro de Linha
                         <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
                     </label>
                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
-                  <button onclick="abrirModalInfo('luz-computador')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  <button onclick="abrirModalInfo('luz-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
+                <!-- luz-software -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                     <input type="checkbox" id="luz-software" class="firebase-sync mt-0.5 md:mt-0" data-offset="55" />
                     <div class="ml-3 flex-1">
@@ -234,20 +235,116 @@
                   </div>
               </div>
             </div>
+
+            <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+              <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] bg-orange-900/30 text-orange-300 px-2 py-1 rounded font-mono border border-orange-900/50">T-40</span>
+                  <span class="text-base md:text-lg text-white">Preparativos</span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+              </button>
+              
+              <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                <!-- luz-2 -->
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                  <input type="checkbox" id="luz-2" class="firebase-sync mt-0.5 md:mt-0" data-offset="40" />
+                  <div class="ml-3 flex-1">
+                    <label for="luz-2" class="text-sm md:text-base font-semibold text-white block">
+                        Checar comunicação (Software/Aparelhos)
+                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                    </label>
+                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                  </div>
+                  <button onclick="abrirModalInfo('luz-2')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                </div>
+
+                <!-- luz-3 --> 
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                  <input type="checkbox" id="luz-3" class="firebase-sync mt-0.5 md:mt-0" data-offset="40" />
+                  <div class="ml-3 flex-1">
+                    <label for="luz-3" class="text-sm md:text-base font-semibold text-white block">
+                        Testar máquina de fumaça <br>(Antes de testar conferir se há líquido)
+                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                    </label>
+                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                  </div>
+                  <button onclick="abrirModalInfo('luz-3')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                </div>
+
+                <!-- luz-4 -->
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="luz-4" class="firebase-sync mt-0.5 md:mt-0" data-offset="35" />
+                    <div class="ml-3 flex-1">
+                      <label for="luz-4" class="text-sm md:text-base font-semibold text-white block">
+                          Pegar rádio e fone para comunicação
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('luz-4')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+
+                <!-- luz-5 -->
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                  <input type="checkbox" id="luz-5" class="firebase-sync mt-0.5 md:mt-0" data-offset="20" />
+                  <div class="ml-3 flex-1">
+                    <label for="luz-5" class="text-sm md:text-base font-semibold text-white block">
+                      Conferir Rádio (Frequência e Volume)
+                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                    </label>
+                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                  </div>
+                  <button onclick="abrirModalInfo('luz-5')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                </div>
+
+              </div> 
+            </div>
+
+            <!-- Minutos Finais -->
+            <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+              <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                <div class="flex items-center gap-3">
+                  <span class="text-[10px] bg-red-900/30 text-red-300 px-2 py-1 rounded font-mono border border-red-900/50">T-20</span>
+                  <span class="text-base md:text-lg text-white">Minutos Finais</span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+              </button>
+
+              <!-- luz-6 -->
+              <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="luz-6" class="firebase-sync mt-0.5 md:mt-0" data-offset="15" />
+                    <div class="ml-3 flex-1">
+                      <label for="luz-6" class="text-sm md:text-base font-semibold text-white block">
+                          Desligar a Luz de Palco
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('luz-6')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+              </div>
+            </div>
         </section>
 
+
+        <!-- Transmissão -->
         <section id="transmissao" class="section-content space-y-4 md:space-y-6 hidden">
              <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                 <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                   <div class="flex items-center gap-3">
-                    <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-90</span>
+                    <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-60</span>
                     <span class="text-base md:text-lg text-white">Vídeo: Pré-Culto</span>
                   </div>
                   <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                 </button>
+
+                <!-- trans-1 -->
                 <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                   <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
-                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="90" />
+
+                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="60" />
                     <div class="ml-3 flex-1">
                       <label for="trans-1" class="text-sm md:text-base font-semibold text-white block">
                           Ligar Switcher
@@ -261,6 +358,8 @@
               </div>
         </section>
 
+
+        <!-- Projeção -->
         <section id="projecao" class="section-content space-y-4 md:space-y-6 hidden">
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
@@ -270,6 +369,8 @@
                  </div>
                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                </button>
+
+               <!-- proj-1 -->
                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
                    <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="60" />
@@ -282,6 +383,8 @@
                    </div>
                    <button onclick="abrirModalInfo('proj-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                  </div>
+
+                  <!-- proj-2 -->
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
                     <input type="checkbox" id="proj-2" class="firebase-sync" data-offset="55" />
                     <div class="ml-3 flex-1">
@@ -422,7 +525,7 @@
             });
         }
         updateDateBadge(historyDateInput.value);
-        recalculateDeadlines(); // Inicia relógio
+        recalculateDeadlines();
       }
 
       function updateDateBadge(dateValue) {
@@ -439,7 +542,7 @@
         docId = `${dateToUse}_${serviceTime.replace(':','-')}`;
         updateDateBadge(dateToUse);
 
-        // Limpa a tela antes de carregar o novo dia (Corrige o BUG DE ATUALIZAÇÃO)
+        // Limpa a tela antes de carregar o novo dia
         updateCheckboxes({}); 
 
         const sessionRef = doc(db, "ro_tec_sessions", docId);
@@ -449,7 +552,7 @@
                 updateCheckboxes(data.tasks || {});
             } else {
                 if (dateToUse === todayISO) setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
-                else updateCheckboxes({}); // Garante limpeza se dia for vazio
+                else updateCheckboxes({});
             }
         });
 
@@ -502,7 +605,7 @@
         });
       }
 
-      // --- RELÓGIO DE BLOQUEIO (Correção do BUG DE BLOQUEIO) ---
+      // --- RELÓGIO DE BLOQUEIO ---
       setInterval(() => {
         const now = new Date();
         const timeStr = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
@@ -523,7 +626,6 @@
              taskItem.classList.add("expired");
              if (label && !input.checked) label.innerHTML = `<i class="fas fa-lock mr-1"></i> ${deadline}`;
           } else if (!isToday && userRole !== 'admin') {
-             // Bloqueia dias passados/futuros para operadores
              input.disabled = true;
           } else {
              // Libera
@@ -557,9 +659,15 @@
       }
 
       const MANUAL_INSTRUCOES = {
-        'luz-computador': { titulo: "Ligar PC", desc: "Senha: Luz. Ligar filtro de linha primeiro.", link: "" },
-        'trans-1': { titulo: "Switcher", desc: "Verificar cabos HDMI.", link: "" },
-        'proj-1': { titulo: "Projetores", desc: "Verificar se o controle está na posição correta. Ligar Projetor Principal e Retorno.", link: "" }
+        'luz-1': { titulo: "Ligar filtro de linha", desc: "Ligar filtro de linha embaixo da mesa de som, primeiro liga o filtro de cima, após ligado, ligar o segundo. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-software': { titulo: "Iniciar GrandMA", desc: "Abrir o Software da GrandMA no computador e fazer a conexão em settings. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'trans-1': { titulo: "Switcher", desc: "Verificar cabos HDMI.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'proj-1': { titulo: "Projetores", desc: "Verificar se o controle está na posição correta. Ligar Projetor Principal e Retorno.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-2': { titulo: "Comunicação DMX", desc: "Após fazer a conexão, conferir se cada comando está sendo executado.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-3': { titulo: "Máquina de Fumaça", desc: "Abra o tanque e verifique se o nível está acima da metade.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-4': { titulo: "Rádio comunicador", desc: "Pegue o Rádio para comunicação no carregador, na sala da projeção/transmissão", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-5': { titulo: "Frequência do Rádio", desc: "Confira se o rádio está na frequência correta.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-6': { titulo: "Luz de Palco", desc: "Desligar a luz de palco pelo painel da GrandMA ou manualmente.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
       };
 
       window.abrirModalInfo = (id) => {
@@ -598,6 +706,151 @@
           input.setAttribute("data-deadline", d.toLocaleTimeString("pt-PT", {hour:"2-digit", minute:"2-digit"}));
         });
       }
+
+      // --- MÓDULO DE MANUTENÇÃO V2 (COM MODAL PERSONALIZADO) ---
+      
+      (function() {
+          const MAINT_PASS = "dev2026"; // <--- SUA SENHA
+          const STATUS_DOC = "ro_tec_config/global_status";
+          
+          let isMaintenanceActive = false;
+
+          // 1. Injetar HTML da Tela de Manutenção + Modal de Senha
+          const layersDiv = document.createElement("div");
+          layersDiv.innerHTML = `
+            <div id="sys-maintenance-overlay" class="fixed inset-0 z-[990] bg-gray-950 flex flex-col items-center justify-center p-6 hidden text-center backdrop-blur-xl">
+                <div id="maint-unlock-trigger" class="w-24 h-24 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 animate-pulse cursor-pointer transition-colors hover:bg-yellow-500/20 active:scale-95">
+                    <i class="fas fa-tools text-yellow-500 text-4xl"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">SISTEMA EM MANUTENÇÃO</h1>
+                <p class="text-gray-400 max-w-lg text-sm md:text-base leading-relaxed">
+                    Estamos aplicando melhorias e atualizações de segurança no RO-TEC. 
+                    <br>O acesso retornará em instantes.
+                </p>
+                <div class="mt-12 py-2 px-4 bg-gray-900 border border-gray-800 rounded font-mono text-[10px] text-gray-600 uppercase tracking-widest">
+                    Status Code: 503 • Service Unavailable
+                </div>
+            </div>
+
+            <div id="custom-pass-modal" class="fixed inset-0 z-[1000] bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm">
+                <div class="bg-gray-900 border border-gray-700 w-full max-w-sm rounded-2xl shadow-2xl p-6 relative transform transition-all scale-100">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-lock text-blue-500 text-lg"></i>
+                        </div>
+                        <h3 id="custom-modal-title" class="text-lg font-bold text-white">Autenticação DEV</h3>
+                        <p class="text-gray-500 text-xs mt-1">Digite a credencial de desenvolvedor</p>
+                    </div>
+                    
+                    <input type="password" id="custom-pass-input" placeholder="Senha..." class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-center text-lg outline-none focus:border-blue-500 transition-colors mb-4 placeholder-gray-600 tracking-widest" />
+                    
+                    <div class="flex gap-3">
+                        <button id="btn-cancel-pass" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl transition-all text-sm">Cancelar</button>
+                        <button id="btn-confirm-pass" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+          `;
+          document.body.appendChild(layersDiv);
+
+          // 2. Função para Chamar o Modal de Senha (Promise)
+          function askPassword(title) {
+              return new Promise((resolve) => {
+                  const modal = document.getElementById("custom-pass-modal");
+                  const input = document.getElementById("custom-pass-input");
+                  const btnConfirm = document.getElementById("btn-confirm-pass");
+                  const btnCancel = document.getElementById("btn-cancel-pass");
+                  const titleEl = document.getElementById("custom-modal-title");
+
+                  titleEl.innerText = title;
+                  input.value = ""; // Limpa input
+                  modal.classList.remove("hidden");
+                  modal.classList.add("flex");
+                  setTimeout(() => input.focus(), 100); // Foca automaticamente
+
+                  const handleConfirm = () => {
+                      close();
+                      resolve(input.value);
+                  };
+
+                  const handleCancel = () => {
+                      close();
+                      resolve(null);
+                  };
+
+                  const close = () => {
+                      modal.classList.add("hidden");
+                      modal.classList.remove("flex");
+                      btnConfirm.removeEventListener("click", handleConfirm);
+                      btnCancel.removeEventListener("click", handleCancel);
+                      input.onkeydown = null; // Remove listener do Enter
+                  };
+
+                  btnConfirm.addEventListener("click", handleConfirm);
+                  btnCancel.addEventListener("click", handleCancel);
+                  
+                  // Aceitar Enter no input
+                  input.onkeydown = (e) => {
+                      if(e.key === "Enter") handleConfirm();
+                      if(e.key === "Escape") handleCancel();
+                  };
+              });
+          }
+
+          // 3. Monitorar Status (Firestore)
+          const statusRef = doc(db, "ro_tec_config", "global_status");
+          onSnapshot(statusRef, (snap) => {
+              isMaintenanceActive = snap.exists() && snap.data().maintenanceMode === true;
+              const overlay = document.getElementById("sys-maintenance-overlay");
+              
+              if (isMaintenanceActive) {
+                  overlay.classList.remove("hidden");
+                  overlay.classList.add("flex");
+                  document.body.style.overflow = "hidden";
+              } else {
+                  overlay.classList.add("hidden");
+                  overlay.classList.remove("flex");
+                  document.body.style.overflow = "";
+              }
+          });
+
+          // 4. Gatilho ATIVAR (#MANUTENCAO no Login)
+          const nameInput = document.getElementById("user-name-input");
+          if(nameInput) {
+              nameInput.addEventListener("change", async (e) => {
+                  if(e.target.value.trim().toUpperCase() === "#MANUTENCAO") {
+                      e.target.value = ""; // Limpa comando para não ficar visível
+                      const pwd = await askPassword("BLOQUEAR SISTEMA 🔒");
+                      if(pwd === MAINT_PASS) {
+                          await setDoc(statusRef, { maintenanceMode: true }, { merge: true });
+                          // alert opcional removido para ficar mais clean
+                      } else if (pwd !== null) {
+                          alert("Senha Incorreta!");
+                      }
+                  }
+              });
+          }
+
+          // 5. Gatilho DESATIVAR (5 Cliques no ícone de manutenção)
+          let clickCount = 0;
+          const unlockBtn = document.getElementById("maint-unlock-trigger");
+          if(unlockBtn) {
+              unlockBtn.addEventListener("click", async () => {
+                  clickCount++;
+                  if(clickCount === 5) {
+                      clickCount = 0;
+                      const pwd = await askPassword("LIBERAR SISTEMA ✅");
+                      if(pwd === MAINT_PASS) {
+                          await setDoc(statusRef, { maintenanceMode: false }, { merge: true });
+                      } else if (pwd !== null) {
+                          alert("Senha Incorreta!");
+                      }
+                  }
+                  setTimeout(() => clickCount = 0, 2000);
+              });
+          }
+      })();
+
     </script>
   </body>
 </html>
