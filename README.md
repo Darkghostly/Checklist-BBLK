@@ -10,10 +10,6 @@
     <a href="https://darkghostly.github.io/Checklist-BBLK/">
       <img src="https://img.shields.io/badge/ACESSAR_SISTEMA-CLIQUE_AQUI-blue?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Acessar Sistema">
     </a>
-    
-    <a href="./LICENSE">
-      <img src="https://img.shields.io/badge/LICENSE-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License MIT">
-    </a>
   </p>
 </div>
 ---
