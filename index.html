@@ -26,11 +26,11 @@
         height: 100%; width: 100%; overflow: hidden;
         overscroll-behavior: none; background-color: #111827;
         font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent;
+        transition: filter 0.3s ease;
       }
       #main-scroll-area { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
       
       .task-item.completed label { text-decoration: line-through; color: #6b7280; }
-      
       .task-item.expired { opacity: 0.5; background-color: rgba(31, 41, 55, 0.5); border: 1px solid #374151; }
       .task-item.expired label { cursor: not-allowed; color: #6b7280; }
       .task-item.expired .deadline-label { color: #ef4444; font-weight: bold; }
@@ -68,6 +68,19 @@
   </head>
   <body class="text-gray-200 flex flex-col md:flex-row fixed inset-0">
     
+    <div id="locked-overlay" class="fixed inset-0 z-[40] bg-gray-950/90 backdrop-blur-md hidden flex-col items-center justify-center p-6 text-center md:ml-72">
+        <div class="w-24 h-24 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
+            <i class="fas fa-lock text-yellow-500 text-4xl"></i>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Relatório Finalizado</h2>
+        <p class="text-gray-400 max-w-md text-sm md:text-base leading-relaxed">
+            Este relatório foi fechado por um administrador e não pode mais ser alterado.
+            <br><br>
+            <span class="text-yellow-500/80 text-xs uppercase tracking-widest font-bold">Precisa de ajuste?</span>
+            <br>Entre em contato com a liderança.
+        </p>
+    </div>
+
     <div id="info-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
         <div class="bg-gray-900 border border-gray-700 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative">
             <div class="flex justify-between items-start p-6 border-b border-gray-800 bg-gray-800/50">
@@ -89,33 +102,37 @@
         <div class="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mb-4 mx-auto">
             <i class="fas fa-user-shield text-blue-500 text-xl"></i>
         </div>
-        <h2 class="text-xl font-bold text-white mb-1 text-center">Acesso Relatório de Culto</h2>
+        <h2 class="text-xl font-bold text-white mb-1 text-center">Acesso RO-TEC</h2>
         <p class="text-gray-400 mb-6 text-xs text-center">Selecione sua função para hoje</p>
         
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
-            <input type="text" id="user-name-input" placeholder="Nome" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
+            <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
         </div>
+
         <div class="mb-3">
-            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto</label>
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto / Evento</label>
             <select id="modal-service-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
-            <option value="10:00">Celebração em Família Manhã (10h)</option>
-            <option value="18:00" selected>Celebração em Família Noite (18h)</option>
-            <option value="20:00">Reaviva (20h)</option>
+            <option value="10:00">Domingo Manhã (10h)</option>
+            <option value="18:00" selected>Domingo Noite (18h)</option>
+            <option value="20:00">Quinta Feira (20h)</option>
             </select>
         </div>
+
         <div class="mb-6">
-            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Função do Dia</label>
+            <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Sua Função Hoje</label>
             <select id="role-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
                 <option value="iluminacao">💡 Iluminação</option>
                 <option value="transmissao">🎥 Transmissão/Vídeo</option>
                 <option value="projecao">📽️ Projeção</option>
-                <option value="admin">🛡️ Administrador</option>
+                <option value="admin">🛡️ Administrador Geral</option>
             </select>
+            
             <div id="admin-pass-container" class="hidden mt-3">
-                <input type="password" id="admin-pass-input" placeholder="Senha" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
+                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
             </div>
         </div>
+
         <button id="start-app-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">Entrar</button>
       </div>
     </div>
@@ -127,7 +144,7 @@
             <i class="fas fa-satellite-dish text-white text-xs md:text-base"></i>
           </div>
           <div>
-            <h1 class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none">Relatório de Culto</h1>
+            <h1 class="text-lg md:text-xl font-black text-white tracking-tighter uppercase leading-none">RO-TEC</h1>
             <span id="role-badge" class="text-[10px] text-gray-500 font-medium block">...</span>
           </div>
         </div>
@@ -142,7 +159,7 @@
       <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-2">
           <div class="flex items-center justify-between mb-2">
             <label class="text-[10px] text-gray-500 uppercase font-bold">Data (Histórico):</label>
-            <i id="lock-icon" class="fas fa-lock text-gray-600 text-xs" title="Apenas Administrador"></i>
+            <i id="lock-icon" class="fas fa-lock text-gray-600 text-xs" title="Bloqueado para Operadores"></i>
           </div>
           <input type="date" id="history-date-input" class="bg-gray-900 text-white text-sm p-2 rounded-lg border border-gray-700 outline-none w-full cursor-not-allowed opacity-70" disabled />
       </div>
@@ -156,28 +173,32 @@
       </div>
 
       <nav id="nav-container" class="flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto pb-1 scrollbar-hide">
-        <a href="#iluminacao" id="btn-nav-iluminacao" class="nav-link active text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
+        <a href="#iluminacao" id="btn-nav-iluminacao" class="nav-link active text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-white-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
           <i class="fas fa-lightbulb w-5 mr-1.5"></i>Iluminação
         </a>
-        <a href="#transmissao" id="btn-nav-transmissao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
+        <a href="#transmissao" id="btn-nav-transmissao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-white-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
           <i class="fas fa-video w-5 mr-1.5"></i>Transmissão
         </a>
-        <a href="#projecao" id="btn-nav-projecao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-gray-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
+        <a href="#projecao" id="btn-nav-projecao" class="nav-link text-left px-3 py-2 md:px-4 md:py-3 rounded-xl hover:bg-white-800 transition-all flex-shrink-0 text-sm md:text-base border border-transparent whitespace-nowrap flex items-center">
           <i class="fas fa-film w-5 mr-1.5"></i>Projeção
         </a>
       </nav>
       
       <div class="mt-auto w-full space-y-3 pt-4 hidden md:block">
-          <a href="https://www.youtube.com/@B%C3%ADblicaVida" target="_blank" class="flex items-center w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-red-900/20 group cursor-pointer relative overflow-hidden">
+          <a href="https://www.youtube.com/@B%C3%ADblicaVida" target="_blank" class="flex items-center w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-900/20 group cursor-pointer relative overflow-hidden">
              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
              <div class="bg-white/20 p-2 rounded-lg mr-3"><i class="fab fa-youtube text-white text-lg"></i></div>
              <div class="flex-1 text-left">
-                 <div class="text-[10px] uppercase font-bold text-red-200 tracking-wider">Treinamento</div>
+                 <div class="text-[10px] uppercase font-bold text-blue-200 tracking-wider">Treinamento</div>
                  <div class="text-sm font-bold">Vídeo Tutorial</div>
              </div>
              <i class="fas fa-external-link-alt text-xs opacity-50 group-hover:translate-x-1 transition-transform"></i>
           </a>
-          <div id="admin-controls" class="hidden">
+          
+          <div id="admin-controls" class="hidden space-y-2">
+            <button id="admin-lock-btn" class="w-full border border-yellow-600/50 bg-yellow-900/20 text-yellow-500 hover:bg-yellow-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
+                <i class="fas fa-lock-open mr-2" id="lock-btn-icon"></i> <span id="lock-btn-text">Fechar Relatório</span>
+            </button>
             <button id="admin-reset-btn" class="w-full border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
                 <i class="fas fa-trash-arrow-up mr-2"></i> Resetar Tudo
             </button>
@@ -198,8 +219,8 @@
             </div>
         </header>
 
+        <!-- Inicialização -->
         <section id="iluminacao" class="section-content space-y-4 md:space-y-6">
-          <!-- Inicialização -->            
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
               <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                 <div class="flex items-center gap-3">
@@ -209,7 +230,6 @@
                 <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
               </button>
               <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
-                <!-- luz-1 -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                   <input type="checkbox" id="luz-1" class="firebase-sync mt-0.5 md:mt-0" data-offset="60" />
                   <div class="ml-3 flex-1">
@@ -219,9 +239,8 @@
                     </label>
                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
-                  <button onclick="abrirModalInfo('luz-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  <button onclick="abrirModalInfo('luz-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
-                <!-- luz-software -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                     <input type="checkbox" id="luz-software" class="firebase-sync mt-0.5 md:mt-0" data-offset="55" />
                     <div class="ml-3 flex-1">
@@ -231,7 +250,7 @@
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('luz-software')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('luz-software')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
               </div>
             </div>
@@ -246,7 +265,6 @@
               </button>
               
               <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
-                <!-- luz-2 -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                   <input type="checkbox" id="luz-2" class="firebase-sync mt-0.5 md:mt-0" data-offset="40" />
                   <div class="ml-3 flex-1">
@@ -256,10 +274,9 @@
                     </label>
                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
-                  <button onclick="abrirModalInfo('luz-2')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  <button onclick="abrirModalInfo('luz-2')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
 
-                <!-- luz-3 --> 
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                   <input type="checkbox" id="luz-3" class="firebase-sync mt-0.5 md:mt-0" data-offset="40" />
                   <div class="ml-3 flex-1">
@@ -269,10 +286,9 @@
                     </label>
                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
-                  <button onclick="abrirModalInfo('luz-3')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  <button onclick="abrirModalInfo('luz-3')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
 
-                <!-- luz-4 -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                     <input type="checkbox" id="luz-4" class="firebase-sync mt-0.5 md:mt-0" data-offset="35" />
                     <div class="ml-3 flex-1">
@@ -282,10 +298,9 @@
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('luz-4')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('luz-4')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
 
-                <!-- luz-5 -->
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                   <input type="checkbox" id="luz-5" class="firebase-sync mt-0.5 md:mt-0" data-offset="20" />
                   <div class="ml-3 flex-1">
@@ -295,13 +310,11 @@
                     </label>
                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                   </div>
-                  <button onclick="abrirModalInfo('luz-5')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  <button onclick="abrirModalInfo('luz-5')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                 </div>
-
               </div> 
             </div>
 
-            <!-- Minutos Finais -->
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
               <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                 <div class="flex items-center gap-3">
@@ -310,8 +323,6 @@
                 </div>
                 <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
               </button>
-
-              <!-- luz-6 -->
               <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
                     <input type="checkbox" id="luz-6" class="firebase-sync mt-0.5 md:mt-0" data-offset="15" />
@@ -322,29 +333,24 @@
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('luz-6')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('luz-6')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
               </div>
             </div>
         </section>
 
-
-        <!-- Transmissão -->
         <section id="transmissao" class="section-content space-y-4 md:space-y-6 hidden">
              <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                 <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                   <div class="flex items-center gap-3">
-                    <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-60</span>
+                    <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-90</span>
                     <span class="text-base md:text-lg text-white">Vídeo: Pré-Culto</span>
                   </div>
                   <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                 </button>
-
-                <!-- trans-1 -->
                 <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                   <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
-
-                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="60" />
+                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="90" />
                     <div class="ml-3 flex-1">
                       <label for="trans-1" class="text-sm md:text-base font-semibold text-white block">
                           Ligar Switcher
@@ -352,14 +358,12 @@
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('trans-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('trans-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
                 </div>
               </div>
         </section>
 
-
-        <!-- Projeção -->
         <section id="projecao" class="section-content space-y-4 md:space-y-6 hidden">
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
@@ -369,8 +373,6 @@
                  </div>
                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                </button>
-
-               <!-- proj-1 -->
                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
                    <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="60" />
@@ -381,10 +383,8 @@
                      </label>
                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                    </div>
-                   <button onclick="abrirModalInfo('proj-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                   <button onclick="abrirModalInfo('proj-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                  </div>
-
-                  <!-- proj-2 -->
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
                     <input type="checkbox" id="proj-2" class="firebase-sync" data-offset="55" />
                     <div class="ml-3 flex-1">
@@ -394,11 +394,12 @@
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('proj-2')" class="text-gray-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('proj-2')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
                </div>
              </div>
        </section>
+
       </div>
     </main>
 
@@ -407,6 +408,7 @@
       import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+      // ⚠️ MANTENHA SUAS CHAVES AQUI
       const firebaseConfig = {
         apiKey: "AIzaSyCi1Z0FvzdUKDviRJaQ79f9AQQvq5ndw8k",
         authDomain: "checklist-bblk.firebaseapp.com",
@@ -431,6 +433,7 @@
       let docId = "";
       let appReady = false;
       let unsubscribeSnapshot = null; 
+      let isReportClosed = false;
 
       const historyDateInput = document.getElementById("history-date-input");
       const lockIcon = document.getElementById("lock-icon");
@@ -542,28 +545,39 @@
         docId = `${dateToUse}_${serviceTime.replace(':','-')}`;
         updateDateBadge(dateToUse);
 
-        // Limpa a tela antes de carregar o novo dia
         updateCheckboxes({}); 
 
         const sessionRef = doc(db, "ro_tec_sessions", docId);
         unsubscribeSnapshot = onSnapshot(sessionRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
+                
+                // --- ATUALIZAÇÃO DO STATUS DE BLOQUEIO ---
+                isReportClosed = data.status === 'fechado';
+                checkReportLock(); // Função Nova para gerenciar o Overlay e o Botão
+
                 updateCheckboxes(data.tasks || {});
             } else {
-                if (dateToUse === todayISO) setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString() }, { merge: true });
-                else updateCheckboxes({});
+                if (dateToUse === todayISO) setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString(), status: 'aberto' }, { merge: true });
+                else updateCheckboxes({}); 
             }
         });
 
         document.querySelectorAll(".firebase-sync").forEach(input => {
             input.onchange = async (e) => {
-                // Bloqueia edição em datas passadas (exceto Admin)
+                // TRAVA 1: DATA
                 if (dateToUse !== todayISO && userRole !== 'admin') {
                     alert("Histórico é apenas leitura!");
                     e.target.checked = !e.target.checked;
                     return;
                 }
+                // TRAVA 2: CADEADO ADMIN (BACKUP SE O OVERLAY FALHAR)
+                if (isReportClosed) {
+                    alert("Relatório FECHADO pelo Administrador.");
+                    e.target.checked = !e.target.checked;
+                    return;
+                }
+
                 const taskData = {
                     checked: e.target.checked,
                     user: e.target.checked ? userName : null,
@@ -618,17 +632,13 @@
           const taskItem = input.closest(".task-item");
           const label = taskItem.querySelector(".deadline-label");
           
-          // Lógica: Se passou da hora E é hoje E usuário não é admin
           if (timeStr > deadline && isToday && userRole !== 'admin') {
-             // Só bloqueia se não estiver marcado (opcional, ou bloqueia tudo)
-             // Aqui bloqueio tudo para editar, mas visualmente mostra checked se tiver
              input.disabled = true; 
              taskItem.classList.add("expired");
              if (label && !input.checked) label.innerHTML = `<i class="fas fa-lock mr-1"></i> ${deadline}`;
           } else if (!isToday && userRole !== 'admin') {
              input.disabled = true;
           } else {
-             // Libera
              input.disabled = false;
              taskItem.classList.remove("expired");
              if (label) label.innerText = deadline;
@@ -647,6 +657,52 @@
               historyDateInput.value = todayISO;
           }
       });
+
+      // --- GERENCIAMENTO DE BLOQUEIO (ADMIN vs OPERADOR) ---
+      const btnLock = document.getElementById("admin-lock-btn");
+      const iconLock = document.getElementById("lock-btn-icon");
+      const textLock = document.getElementById("lock-btn-text");
+      const lockedOverlay = document.getElementById("locked-overlay");
+
+      function checkReportLock() {
+          const isAdmin = userRole === 'admin';
+
+          // 1. Atualiza o Botão do Admin
+          if (isReportClosed) {
+              btnLock.className = "w-full border border-green-600/50 bg-green-900/20 text-green-500 hover:bg-green-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center";
+              iconLock.className = "fas fa-lock mr-2";
+              textLock.innerText = "Reabrir Relatório";
+          } else {
+              btnLock.className = "w-full border border-yellow-600/50 bg-yellow-900/20 text-yellow-500 hover:bg-yellow-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center";
+              iconLock.className = "fas fa-lock-open mr-2";
+              textLock.innerText = "Fechar Relatório";
+          }
+
+          // 2. Controla o Overlay do Operador
+          if (isReportClosed && !isAdmin) {
+              // Se fechado e NÃO é admin: MOSTRA O BLOQUEIO
+              lockedOverlay.classList.remove("hidden");
+              lockedOverlay.classList.add("flex");
+              document.body.classList.add("report-locked");
+          } else {
+              // Se aberto OU se é admin: ESCONDE O BLOQUEIO
+              lockedOverlay.classList.add("hidden");
+              lockedOverlay.classList.remove("flex");
+              document.body.classList.remove("report-locked");
+          }
+      }
+
+      if(btnLock) {
+          btnLock.onclick = async () => {
+              const novoStatus = isReportClosed ? 'aberto' : 'fechado';
+              const acao = isReportClosed ? "Reabrir" : "FECHAR";
+              
+              if(confirm(`Tem certeza que deseja ${acao} este relatório?`)) {
+                  const sessionRef = doc(db, "ro_tec_sessions", docId);
+                  await setDoc(sessionRef, { status: novoStatus }, { merge: true });
+              }
+          }
+      }
 
       const btnReset = document.getElementById("admin-reset-btn");
       if(btnReset) {
@@ -707,15 +763,14 @@
         });
       }
 
-      // --- MÓDULO DE MANUTENÇÃO V2 (COM MODAL PERSONALIZADO) ---
+      // --- MÓDULO DE MANUTENÇÃO ---
       
       (function() {
-          const MAINT_PASS = "dev2026"; // <--- SUA SENHA
+          const MAINT_PASS = "dev2026";
           const STATUS_DOC = "ro_tec_config/global_status";
           
           let isMaintenanceActive = false;
 
-          // 1. Injetar HTML da Tela de Manutenção + Modal de Senha
           const layersDiv = document.createElement("div");
           layersDiv.innerHTML = `
             <div id="sys-maintenance-overlay" class="fixed inset-0 z-[990] bg-gray-950 flex flex-col items-center justify-center p-6 hidden text-center backdrop-blur-xl">
@@ -820,7 +875,7 @@
               nameInput.addEventListener("change", async (e) => {
                   if(e.target.value.trim().toUpperCase() === "#MANUTENCAO") {
                       e.target.value = ""; // Limpa comando para não ficar visível
-                      const pwd = await askPassword("BLOQUEAR SISTEMA 🔒");
+                      const pwd = await askPassword("BLOQUEAR SISTEMA? 🔒");
                       if(pwd === MAINT_PASS) {
                           await setDoc(statusRef, { maintenanceMode: true }, { merge: true });
                           // alert opcional removido para ficar mais clean
