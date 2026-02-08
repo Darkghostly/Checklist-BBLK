@@ -107,15 +107,15 @@
         
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
-            <input type="text" id="user-name-input" placeholder="Insira o seu nome" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
+            <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
         </div>
 
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Culto / Evento</label>
             <select id="modal-service-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none appearance-none focus:border-blue-500 transition-colors">
-            <option value="10:00">Celebração em Familía Manhã (10h)</option>
-            <option value="18:00" selected>Celebração em Familía Noite (18h)</option>
-            <option value="20:00">Reaviva (20h)</option>
+            <option value="10:00">Domingo Manhã (10h)</option>
+            <option value="18:00" selected>Domingo Noite (18h)</option>
+            <option value="20:00">Quinta Feira (20h)</option>
             </select>
         </div>
 
@@ -129,7 +129,7 @@
             </select>
             
             <div id="admin-pass-container" class="hidden mt-3">
-                <input type="password" id="admin-pass-input" placeholder="Senha" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
+                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
             </div>
         </div>
 
@@ -166,7 +166,7 @@
 
       <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 mb-4 hidden md:flex items-center justify-between">
         <div class="overflow-hidden">
-            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Voluntário:</div>
+            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Operador:</div>
             <div id="sidebar-user-name" class="text-white font-semibold truncate text-sm">...</div>
         </div>
         <button class="logout-btn ml-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg transition-colors border border-red-500/20" title="Trocar Função"><i class="fas fa-right-from-bracket"></i></button>
@@ -219,7 +219,6 @@
             </div>
         </header>
 
-        <!-- Inicialização -->
         <section id="iluminacao" class="section-content space-y-4 md:space-y-6">
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
               <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
@@ -337,51 +336,68 @@
                   </div>
               </div>
             </div>
+        </section> <section id="transmissao" class="section-content space-y-4 md:space-y-6 hidden">
+             
+             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-60</span>
+                    <span class="text-base md:text-lg text-white">Vídeo: Pré-Culto</span>
+                  </div>
+                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+                </button>
+                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="trans-1" class="firebase-sync" data-offset="60" />
+                    <div class="ml-3 flex-1">
+                      <label for="trans-1" class="text-sm md:text-base font-semibold text-white block">
+                          Ligar Computador e iniciar os Softwares: Vmix, Luci Studio, TeamViewer e Chrome
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('trans-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+                  
+                </div>
+              </div>
+
+            <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-50</span>
+                    <span class="text-base md:text-lg text-white">Vídeo: Criando live youtube e configuração para rádio</span>
+                  </div>
+                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+                </button>
+                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="trans-2" class="firebase-sync" data-offset="50" />
+                    <div class="ml-3 flex-1">
+                      <label for="trans-2" class="text-sm md:text-base font-semibold text-white block">
+                          Configurar Vmix para transmissão e Chrome (confirmar se estão se comunicando bem)
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('trans-2')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+
+                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
+                    <input type="checkbox" id="trans-3" class="firebase-sync" data-offset="50" />
+                    <div class="ml-3 flex-1">
+                      <label for="trans-3" class="text-sm md:text-base font-semibold text-white block">
+                          Ligar Computador e iniciar os Softwares: Vmix, Luci Studio, TeamViewer e Chrome
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('trans-3')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+                  
+                </div>
+              </div>
         </section>
-
-<section id="transmissao" class="section-content space-y-4 md:space-y-6 hidden">
-    <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
-        <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
-            <div class="flex items-center gap-3">
-                <span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-1 rounded font-mono border border-purple-900/50">T-90</span>
-                <span class="text-base md:text-lg text-white">Vídeo: Pré-Culto</span>
-            </div>
-            <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
-        </button>
-        
-        <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
-            
-            <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors min-h-[64px]">
-                <input type="checkbox" id="trans-1" class="firebase-sync w-6 h-6 flex-shrink-0 cursor-pointer" data-offset="90" />
-                <div class="ml-3 flex-1 flex flex-col justify-center leading-tight">
-                    <label for="trans-1" class="text-sm md:text-base font-semibold text-white cursor-pointer">
-                        Ligar Computador
-                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
-                    </label>
-                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight block leading-none">--:--</span>
-                </div>
-                <button onclick="abrirModalInfo('trans-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2 flex items-center justify-center">
-                    <i class="fas fa-circle-info text-xl"></i>
-                </button>
-            </div>
-
-            <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors min-h-[64px]">
-                <input type="checkbox" id="trans-2" class="firebase-sync w-6 h-6 flex-shrink-0 cursor-pointer" data-offset="80" />
-                <div class="ml-3 flex-1 flex flex-col justify-center leading-tight">
-                    <label for="trans-2" class="text-sm md:text-base font-semibold text-white cursor-pointer">
-                        Iniciar softwares de transmissão
-                        <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
-                    </label>
-                    <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight block leading-none">--:--</span>
-                </div>
-                <button onclick="abrirModalInfo('trans-1')" class="text-gray-500 hover:text-blue-400 p-2 ml-2 flex items-center justify-center">
-                    <i class="fas fa-circle-info text-xl"></i>
-                </button>
-            </div>
-
-        </div>
-    </div>
-</section>
 
         <section id="projecao" class="section-content space-y-4 md:space-y-6 hidden">
             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
@@ -397,7 +413,7 @@
                    <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="60" />
                    <div class="ml-3 flex-1">
                      <label for="proj-1" class="text-sm md:text-base font-semibold text-white block">
-                         Ligar Projetores
+                         Ligar Computador e Projetores.
                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
                      </label>
                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
@@ -417,6 +433,41 @@
                   </div>
                </div>
              </div>
+
+             <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+               <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
+                 <div class="flex items-center gap-3">
+                   <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-60</span>
+                   <span class="text-base md:text-lg text-white">Projeção: Organizar musícas e playlist ambiente</span>
+                 </div>
+                 <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+               </button>
+               <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
+                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
+                   <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="50" />
+                   <div class="ml-3 flex-1">
+                     <label for="proj-1" class="text-sm md:text-base font-semibold text-white block">
+                         Ligar Computador e Projetores.
+                         <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                     </label>
+                     <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                   </div>
+                   <button onclick="abrirModalInfo('proj-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                 </div>
+                 <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
+                    <input type="checkbox" id="proj-2" class="firebase-sync" data-offset="55" />
+                    <div class="ml-3 flex-1">
+                      <label for="proj-2" class="text-sm md:text-base font-semibold text-white block">
+                          Abrir Software (ProPresenter)
+                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
+                      </label>
+                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
+                    </div>
+                    <button onclick="abrirModalInfo('proj-2')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                  </div>
+               </div>
+             </div>
+
        </section>
 
       </div>
@@ -734,9 +785,10 @@
       }
 
       const MANUAL_INSTRUCOES = {
-        'luz-1': { titulo: "Ligar filtro de linha", desc: "Ligar filtro de linha embaixo da mesa de som, primeiro liga o filtro de cima, após ligado, ligar o segundo de baixo.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-1': { titulo: "Ligar filtro de linha", desc: "Ligar filtro de linha embaixo da mesa de som, primeiro liga o filtro de cima, após ligado, ligar o segundo. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
         'luz-software': { titulo: "Iniciar GrandMA", desc: "Abrir o Software da GrandMA no computador e fazer a conexão em settings. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'trans-1': { titulo: "Ligar computador da Transmissão", desc: "Ao chegar iniciar transmissão", link: "https://www.youtube.com/@B%C3%ADblicaVida"},
+        'trans-1': { titulo: "Ligar", desc: "Verificar se o cabo de energia está conectado. Após isso ligar o computador colocar a senha e iniciar os softwares.", link: "https://youtu.be/5Uuso6KlAlYs" },
+        'trans-2': { titulo: "Configurar Vmix", desc: "No Vmix, configurar as entradas de vídeo e áudio conforme o padrão estabelecido.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
         'proj-1': { titulo: "Projetores", desc: "Verificar se o controle está na posição correta. Ligar Projetor Principal e Retorno.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
         'luz-2': { titulo: "Comunicação DMX", desc: "Após fazer a conexão, conferir se cada comando está sendo executado.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
         'luz-3': { titulo: "Máquina de Fumaça", desc: "Abra o tanque e verifique se o nível está acima da metade.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
