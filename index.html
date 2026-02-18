@@ -11,6 +11,7 @@
 
     <link rel="manifest" href="./manifest.json" />
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -107,7 +108,7 @@
         
         <div class="mb-3">
             <label class="block text-[10px] text-gray-500 mb-1 uppercase font-bold tracking-wider">Seu Nome</label>
-            <input type="text" id="user-name-input" placeholder="Ex: Gustavo" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
+            <input type="text" id="user-name-input" placeholder="Ex: Seu Nome" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-sm outline-none focus:border-blue-500 transition-colors" />
         </div>
 
         <div class="mb-3">
@@ -129,7 +130,7 @@
             </select>
             
             <div id="admin-pass-container" class="hidden mt-3">
-                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-red-900/50" />
+                <input type="password" id="admin-pass-input" placeholder="Senha Mestra" class="w-full bg-gray-800 border border-red-900/50 rounded-xl p-3 text-white text-sm outline-none focus:border-red-500 transition-colors placeholder-white-900/50" />
             </div>
         </div>
 
@@ -196,6 +197,10 @@
           </a>
           
           <div id="admin-controls" class="hidden space-y-2">
+            <button id="admin-reports-btn" class="w-full border border-blue-500/50 bg-blue-900/20 text-blue-400 hover:bg-blue-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
+                <i class="fas fa-chart-pie mr-2"></i> Relatórios & CSV
+            </button>
+
             <button id="admin-lock-btn" class="w-full border border-yellow-600/50 bg-yellow-900/20 text-yellow-500 hover:bg-yellow-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center">
                 <i class="fas fa-lock-open mr-2" id="lock-btn-icon"></i> <span id="lock-btn-text">Fechar Relatório</span>
             </button>
@@ -413,7 +418,7 @@
                    <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="60" />
                    <div class="ml-3 flex-1">
                      <label for="proj-1" class="text-sm md:text-base font-semibold text-white block">
-                         Ligar Computador e Projetores.
+                         Ligar Computador e Projetores
                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
                      </label>
                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
@@ -437,33 +442,34 @@
              <div class="bg-gray-900 rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
                <button class="accordion-toggle w-full text-left p-4 md:p-5 font-bold flex justify-between items-center active:bg-gray-800 transition-colors">
                  <div class="flex items-center gap-3">
-                   <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-60</span>
-                   <span class="text-base md:text-lg text-white">Projeção: Organizar musícas e playlist ambiente</span>
+                   <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded font-mono border border-green-900/50">T-50</span>
+                   <span class="text-base md:text-lg text-white">Projeção: Músicas e Playlist</span>
                  </div>
                  <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
                </button>
                <div class="accordion-content open border-t border-gray-800 bg-gray-900/50 p-4 md:p-6 space-y-3">
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
-                   <input type="checkbox" id="proj-1" class="firebase-sync" data-offset="50" />
+                   <input type="checkbox" id="proj-3" class="firebase-sync" data-offset="50" />
                    <div class="ml-3 flex-1">
-                     <label for="proj-1" class="text-sm md:text-base font-semibold text-white block">
-                         Ligar Computador e Projetores.
+                     <label for="proj-3" class="text-sm md:text-base font-semibold text-white block">
+                         Importar e conferir ordem das músicas
                          <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
                      </label>
                      <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                    </div>
-                   <button onclick="abrirModalInfo('proj-1')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                   <button onclick="abrirModalInfo('proj-3')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                  </div>
+                 
                  <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-800/30">
-                    <input type="checkbox" id="proj-2" class="firebase-sync" data-offset="55" />
+                    <input type="checkbox" id="proj-4" class="firebase-sync" data-offset="45" />
                     <div class="ml-3 flex-1">
-                      <label for="proj-2" class="text-sm md:text-base font-semibold text-white block">
-                          Abrir Software (ProPresenter)
+                      <label for="proj-4" class="text-sm md:text-base font-semibold text-white block">
+                          Configurar Playlist de Som Ambiente
                           <span class="user-tag bg-blue-900 text-blue-300 border border-blue-700"></span>
                       </label>
                       <span class="deadline-label text-[10px] text-gray-500 uppercase tracking-tight mt-1 block">--:--</span>
                     </div>
-                    <button onclick="abrirModalInfo('proj-2')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
+                    <button onclick="abrirModalInfo('proj-4')" class="text-white-500 hover:text-blue-400 p-2 ml-2"><i class="fas fa-circle-info text-lg"></i></button>
                   </div>
                </div>
              </div>
@@ -473,12 +479,65 @@
       </div>
     </main>
 
+    <div id="reports-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4 bg-gray-950/95 backdrop-blur-sm overflow-y-auto">
+      <div class="bg-gray-900 border border-gray-700 w-full max-w-5xl rounded-2xl shadow-2xl relative flex flex-col max-h-[90vh]">
+          <div class="flex justify-between items-center p-6 border-b border-gray-800 bg-gray-800/50 sticky top-0 z-10 backdrop-blur-md">
+              <div>
+                  <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                      <i class="fas fa-chart-line text-blue-500"></i> Dashboard Gerencial
+                  </h3>
+                  <p class="text-gray-400 text-xs mt-1">Análise de dados das últimas sessões</p>
+              </div>
+              <div class="flex gap-3">
+                  <button id="btn-export-csv" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg text-xs flex items-center transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-base"></i> Exportar Dados
+                  </button>
+                  <button onclick="document.getElementById('reports-modal').classList.add('hidden'); document.getElementById('reports-modal').classList.remove('flex');" class="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-2 px-4 rounded-lg transition-colors">
+                      <i class="fas fa-times text-xl"></i>
+                  </button>
+              </div>
+          </div>
+
+          <div class="p-6 overflow-y-auto space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                      <div class="text-gray-500 text-xs uppercase font-bold mb-1">Total de Sessões Analisadas</div>
+                      <div class="text-3xl font-bold text-white" id="stat-sessions">0</div>
+                  </div>
+                  <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                      <div class="text-gray-500 text-xs uppercase font-bold mb-1">Tarefas Realizadas</div>
+                      <div class="text-3xl font-bold text-emerald-400" id="stat-tasks">0</div>
+                  </div>
+                  <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                      <div class="text-gray-500 text-xs uppercase font-bold mb-1">Operador Mais Ativo</div>
+                      <div class="text-xl font-bold text-blue-400 truncate" id="stat-top-user">--</div>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                      <h4 class="text-gray-300 font-bold mb-4 text-sm flex items-center"><i class="fas fa-calendar-check mr-2 text-blue-500"></i> Tarefas por Culto</h4>
+                      <div class="relative h-64 w-full">
+                          <canvas id="chart-timeline"></canvas>
+                      </div>
+                  </div>
+                  <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                      <h4 class="text-gray-300 font-bold mb-4 text-sm flex items-center"><i class="fas fa-users mr-2 text-purple-500"></i> Engajamento por Voluntário</h4>
+                      <div class="relative h-64 w-full flex justify-center">
+                          <canvas id="chart-users"></canvas>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
       import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-      import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+      import { getFirestore, doc, setDoc, onSnapshot, updateDoc, enableIndexedDbPersistence, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      // ⚠️ MANTENHA SUAS CHAVES AQUI
+      // ⚠️ SUAS CHAVES
       const firebaseConfig = {
         apiKey: "AIzaSyBjiEZaB-a27Hr0jy4kC4MW0srQyTAor6o",
         authDomain: "checklist-bblk.firebaseapp.com",
@@ -492,6 +551,7 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
+      // Persistência
       enableIndexedDbPersistence(db).catch((err) => {
           if (err.code == 'failed-precondition') console.log('Múltiplas abas.');
           else if (err.code == 'unimplemented') console.log('Sem persistência.');
@@ -512,6 +572,8 @@
 
       const roleSelect = document.getElementById("role-select");
       const adminPassContainer = document.getElementById("admin-pass-container");
+
+      // --- LOGIN ---
       roleSelect.addEventListener("change", (e) => {
         if(e.target.value === 'admin') adminPassContainer.classList.remove("hidden");
         else adminPassContainer.classList.add("hidden");
@@ -569,7 +631,6 @@
             historyDateInput.classList.add("cursor-pointer", "border-blue-500", "text-blue-300");
             lockIcon.className = "fas fa-unlock text-blue-500 text-xs";
             lockIcon.title = "Modo Histórico Ativo";
-            
             historyDateInput.onchange = (e) => { if(e.target.value) connectDB(e.target.value); };
 
             document.body.classList.add("show-tags");
@@ -608,6 +669,7 @@
           document.getElementById("display-date-badge").innerHTML = `<i class="far fa-calendar-alt mr-1"></i> ${dateObj.toLocaleDateString('pt-BR', dateOptions)}`;
       }
 
+      // --- CONEXÃO BD ---
       function connectDB(specificDate = null) {
         if (unsubscribeSnapshot) unsubscribeSnapshot();
 
@@ -621,32 +683,43 @@
         unsubscribeSnapshot = onSnapshot(sessionRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                
-                // --- ATUALIZAÇÃO DO STATUS DE BLOQUEIO ---
                 isReportClosed = data.status === 'fechado';
-                checkReportLock(); // Função Nova para gerenciar o Overlay e o Botão
+                
+                if (!data.createdAt) {
+                    setDoc(sessionRef, { createdAt: new Date().toISOString() }, { merge: true });
+                }
 
+                checkReportLock();
                 updateCheckboxes(data.tasks || {});
             } else {
-                if (dateToUse === todayISO) setDoc(sessionRef, { createdBy: userName, createdAt: new Date().toISOString(), status: 'aberto' }, { merge: true });
-                else updateCheckboxes({}); 
+                if (dateToUse === todayISO) {
+                    setDoc(sessionRef, { 
+                        createdBy: userName, 
+                        createdAt: new Date().toISOString(), 
+                        status: 'aberto' 
+                    }, { merge: true });
+                } else {
+                    updateCheckboxes({}); 
+                }
             }
         });
 
         document.querySelectorAll(".firebase-sync").forEach(input => {
             input.onchange = async (e) => {
-                // TRAVA 1: DATA
                 if (dateToUse !== todayISO && userRole !== 'admin') {
                     alert("Histórico é apenas leitura!");
                     e.target.checked = !e.target.checked;
                     return;
                 }
-                // TRAVA 2: CADEADO ADMIN (BACKUP SE O OVERLAY FALHAR)
                 if (isReportClosed) {
                     alert("Relatório FECHADO pelo Administrador.");
                     e.target.checked = !e.target.checked;
                     return;
                 }
+                
+                // Visual Imediato
+                const taskItem = e.target.closest(".task-item");
+                taskItem.classList.toggle("completed", e.target.checked);
 
                 const taskData = {
                     checked: e.target.checked,
@@ -662,34 +735,36 @@
       function updateCheckboxes(tasksData) {
         document.querySelectorAll(".firebase-sync").forEach(input => {
             const task = tasksData[input.id];
+            const taskItem = input.closest(".task-item");
+
             if (task) {
-                if (input.checked !== task.checked) {
-                    input.checked = task.checked;
-                    input.closest(".task-item").classList.toggle("completed", input.checked);
-                }
-                const tag = input.closest(".task-item").querySelector(".user-tag");
+                if (input.checked !== task.checked) input.checked = task.checked;
+                
+                // Força visual
+                taskItem.classList.toggle("completed", task.checked);
+
+                const tag = taskItem.querySelector(".user-tag");
                 if (tag) {
-                    if (userRole === 'admin' && task.checked && task.timestamp) {
-                        const dateObj = new Date(task.timestamp);
-                        const timeStr = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                        const dateStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                        tag.innerHTML = `${task.user} <span class="opacity-60 font-normal ml-2 border-l border-blue-500/50 pl-2 text-[9px] tracking-normal">${dateStr} ${timeStr}</span>`;
-                        tag.style.display = 'inline-flex';
-                    } else if (userRole === 'admin' && task.checked) {
-                        tag.innerText = task.user || "ANÔNIMO";
+                    if (userRole === 'admin' && task.checked) {
+                        let timeStr = "";
+                        if(task.timestamp) {
+                             const dateObj = new Date(task.timestamp);
+                             timeStr = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        }
+                        tag.innerHTML = `${task.user} <span class="opacity-60 font-normal ml-2 border-l border-blue-500/50 pl-2 text-[9px] tracking-normal">${timeStr}</span>`;
                         tag.style.display = 'inline-flex';
                     } else { tag.style.display = 'none'; }
                 }
             } else {
                 input.checked = false;
-                input.closest(".task-item").classList.remove("completed");
-                const tag = input.closest(".task-item").querySelector(".user-tag");
+                taskItem.classList.remove("completed");
+                const tag = taskItem.querySelector(".user-tag");
                 if(tag) tag.style.display = 'none';
             }
         });
       }
 
-      // --- RELÓGIO DE BLOQUEIO ---
+      // --- RELÓGIO ---
       setInterval(() => {
         const now = new Date();
         const timeStr = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
@@ -728,7 +803,7 @@
           }
       });
 
-      // --- GERENCIAMENTO DE BLOQUEIO (ADMIN vs OPERADOR) ---
+      // --- ADMIN LOCK ---
       const btnLock = document.getElementById("admin-lock-btn");
       const iconLock = document.getElementById("lock-btn-icon");
       const textLock = document.getElementById("lock-btn-text");
@@ -736,8 +811,6 @@
 
       function checkReportLock() {
           const isAdmin = userRole === 'admin';
-
-          // 1. Atualiza o Botão do Admin
           if (isReportClosed) {
               btnLock.className = "w-full border border-green-600/50 bg-green-900/20 text-green-500 hover:bg-green-900/40 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center";
               iconLock.className = "fas fa-lock mr-2";
@@ -747,18 +820,12 @@
               iconLock.className = "fas fa-lock-open mr-2";
               textLock.innerText = "Fechar Relatório";
           }
-
-          // 2. Controla o Overlay do Operador
           if (isReportClosed && !isAdmin) {
-              // Se fechado e NÃO é admin: MOSTRA O BLOQUEIO
               lockedOverlay.classList.remove("hidden");
               lockedOverlay.classList.add("flex");
-              document.body.classList.add("report-locked");
           } else {
-              // Se aberto OU se é admin: ESCONDE O BLOQUEIO
               lockedOverlay.classList.add("hidden");
               lockedOverlay.classList.remove("flex");
-              document.body.classList.remove("report-locked");
           }
       }
 
@@ -766,7 +833,6 @@
           btnLock.onclick = async () => {
               const novoStatus = isReportClosed ? 'aberto' : 'fechado';
               const acao = isReportClosed ? "Reabrir" : "FECHAR";
-              
               if(confirm(`Tem certeza que deseja ${acao} este relatório?`)) {
                   const sessionRef = doc(db, "ro_tec_sessions", docId);
                   await setDoc(sessionRef, { status: novoStatus }, { merge: true });
@@ -777,24 +843,16 @@
       const btnReset = document.getElementById("admin-reset-btn");
       if(btnReset) {
         btnReset.onclick = async () => {
-            if(confirm("ATENÇÃO: Isso apagará os dados da data selecionada!")) {
+            if(confirm("ATENÇÃO: Isso apagará TODAS as tarefas desta data!")) {
                 const sessionRef = doc(db, "ro_tec_sessions", docId);
                 await updateDoc(sessionRef, { tasks: {} });
             }
         }
       }
 
+      // --- INFO ---
       const MANUAL_INSTRUCOES = {
-        'luz-1': { titulo: "Ligar filtro de linha", desc: "Ligar filtro de linha embaixo da mesa de som, primeiro liga o filtro de cima, após ligado, ligar o segundo. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-software': { titulo: "Iniciar GrandMA", desc: "Abrir o Software da GrandMA no computador e fazer a conexão em settings. ", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'trans-1': { titulo: "Ligar", desc: "Verificar se o cabo de energia está conectado. Após isso ligar o computador colocar a senha e iniciar os softwares.", link: "https://youtu.be/5Uuso6KlAlYs" },
-        'trans-2': { titulo: "Configurar Vmix", desc: "No Vmix, configurar as entradas de vídeo e áudio conforme o padrão estabelecido.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'proj-1': { titulo: "Projetores", desc: "Verificar se o controle está na posição correta. Ligar Projetor Principal e Retorno.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-2': { titulo: "Comunicação DMX", desc: "Após fazer a conexão, conferir se cada comando está sendo executado.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-3': { titulo: "Máquina de Fumaça", desc: "Abra o tanque e verifique se o nível está acima da metade.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-4': { titulo: "Rádio comunicador", desc: "Pegue o Rádio para comunicação no carregador, na sala da projeção/transmissão", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-5': { titulo: "Frequência do Rádio", desc: "Confira se o rádio está na frequência correta.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
-        'luz-6': { titulo: "Luz de Palco", desc: "Desligar a luz de palco pelo painel da GrandMA ou manualmente.", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
+        'luz-1': { titulo: "Ligar filtro de linha", desc: "Ligar filtro de linha embaixo da mesa de som...", link: "https://www.youtube.com/@B%C3%ADblicaVida" },
       };
 
       window.abrirModalInfo = (id) => {
@@ -820,7 +878,6 @@
             document.getElementById(link.getAttribute("href").substring(1)).classList.remove("hidden");
         }
       });
-      
       document.querySelectorAll(".accordion-toggle").forEach(btn => btn.onclick = () => btn.nextElementSibling.classList.toggle("open"));
 
       function recalculateDeadlines() {
@@ -834,149 +891,222 @@
         });
       }
 
-      // --- MÓDULO DE MANUTENÇÃO ---
+      // --- DASHBOARD ATUALIZADO (COM FILTRO "APENAS ESTE CULTO") ---
+      let chartTimelineInstance = null;
+      let chartUsersInstance = null;
+      let cachedReportData = [];
+      let viewMode = 'all'; // 'all', 'today', 'current'
+
+      const btnReports = document.getElementById("admin-reports-btn");
+      const btnExport = document.getElementById("btn-export-csv");
       
-      (function() {
-          const MAINT_PASS = "dev2026";
-          const STATUS_DOC = "ro_tec_config/global_status";
-          
-          let isMaintenanceActive = false;
-
-          const layersDiv = document.createElement("div");
-          layersDiv.innerHTML = `
-            <div id="sys-maintenance-overlay" class="fixed inset-0 z-[990] bg-gray-950 flex flex-col items-center justify-center p-6 hidden text-center backdrop-blur-xl">
-                <div id="maint-unlock-trigger" class="w-24 h-24 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 animate-pulse cursor-pointer transition-colors hover:bg-yellow-500/20 active:scale-95">
-                    <i class="fas fa-tools text-yellow-500 text-4xl"></i>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">SISTEMA EM MANUTENÇÃO</h1>
-                <p class="text-gray-400 max-w-lg text-sm md:text-base leading-relaxed">
-                    Estamos aplicando melhorias e atualizações de segurança no RO-TEC. 
-                    <br>O acesso retornará em instantes.
-                </p>
-                <div class="mt-12 py-2 px-4 bg-gray-900 border border-gray-800 rounded font-mono text-[10px] text-gray-600 uppercase tracking-widest">
-                    Status Code: 503 • Service Unavailable
-                </div>
-            </div>
-
-            <div id="custom-pass-modal" class="fixed inset-0 z-[1000] bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm">
-                <div class="bg-gray-900 border border-gray-700 w-full max-w-sm rounded-2xl shadow-2xl p-6 relative transform transition-all scale-100">
-                    <div class="text-center mb-6">
-                        <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-lock text-blue-500 text-lg"></i>
-                        </div>
-                        <h3 id="custom-modal-title" class="text-lg font-bold text-white">Autenticação DEV</h3>
-                        <p class="text-gray-500 text-xs mt-1">Digite a credencial de desenvolvedor</p>
-                    </div>
-                    
-                    <input type="password" id="custom-pass-input" placeholder="Senha..." class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white text-center text-lg outline-none focus:border-blue-500 transition-colors mb-4 placeholder-gray-600 tracking-widest" />
-                    
-                    <div class="flex gap-3">
-                        <button id="btn-cancel-pass" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl transition-all text-sm">Cancelar</button>
-                        <button id="btn-confirm-pass" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-lg shadow-blue-900/20">Confirmar</button>
-                    </div>
-                </div>
-            </div>
+      const modalHeader = document.querySelector("#reports-modal h3");
+      // Garante que o select só é adicionado uma vez
+      if(modalHeader && !document.getElementById("filter-view-select")) {
+          const selectHTML = `
+            <select id="filter-view-select" class="ml-4 bg-gray-800 border border-gray-600 text-white text-xs rounded p-1 outline-none">
+                <option value="all">Histórico (30 dias)</option>
+                <option value="today">Todo o Dia (Hoje)</option>
+                <option value="current" selected>Apenas Este Culto</option>
+            </select>
           `;
-          document.body.appendChild(layersDiv);
+          modalHeader.insertAdjacentHTML('beforeend', selectHTML);
+          
+          document.getElementById("filter-view-select").addEventListener("change", (e) => {
+              viewMode = e.target.value;
+              updateStats(cachedReportData);
+              renderCharts(cachedReportData);
+          });
+      }
 
-          // 2. Função para Chamar o Modal de Senha (Promise)
-          function askPassword(title) {
-              return new Promise((resolve) => {
-                  const modal = document.getElementById("custom-pass-modal");
-                  const input = document.getElementById("custom-pass-input");
-                  const btnConfirm = document.getElementById("btn-confirm-pass");
-                  const btnCancel = document.getElementById("btn-cancel-pass");
-                  const titleEl = document.getElementById("custom-modal-title");
-
-                  titleEl.innerText = title;
-                  input.value = ""; // Limpa input
-                  modal.classList.remove("hidden");
-                  modal.classList.add("flex");
-                  setTimeout(() => input.focus(), 100); // Foca automaticamente
-
-                  const handleConfirm = () => {
-                      close();
-                      resolve(input.value);
-                  };
-
-                  const handleCancel = () => {
-                      close();
-                      resolve(null);
-                  };
-
-                  const close = () => {
-                      modal.classList.add("hidden");
-                      modal.classList.remove("flex");
-                      btnConfirm.removeEventListener("click", handleConfirm);
-                      btnCancel.removeEventListener("click", handleCancel);
-                      input.onkeydown = null; // Remove listener do Enter
-                  };
-
-                  btnConfirm.addEventListener("click", handleConfirm);
-                  btnCancel.addEventListener("click", handleCancel);
-                  
-                  // Aceitar Enter no input
-                  input.onkeydown = (e) => {
-                      if(e.key === "Enter") handleConfirm();
-                      if(e.key === "Escape") handleCancel();
-                  };
-              });
-          }
-
-          // 3. Monitorar Status (Firestore)
-          const statusRef = doc(db, "ro_tec_config", "global_status");
-          onSnapshot(statusRef, (snap) => {
-              isMaintenanceActive = snap.exists() && snap.data().maintenanceMode === true;
-              const overlay = document.getElementById("sys-maintenance-overlay");
+      if(btnReports) {
+          btnReports.onclick = async () => {
+              const modal = document.getElementById("reports-modal");
+              modal.classList.remove("hidden");
+              modal.classList.add("flex");
               
-              if (isMaintenanceActive) {
-                  overlay.classList.remove("hidden");
-                  overlay.classList.add("flex");
-                  document.body.style.overflow = "hidden";
-              } else {
-                  overlay.classList.add("hidden");
-                  overlay.classList.remove("flex");
-                  document.body.style.overflow = "";
+              // Define o padrão como "Apenas Este Culto" ao abrir
+              viewMode = 'current';
+              const sel = document.getElementById("filter-view-select");
+              if(sel) sel.value = 'current';
+
+              if(cachedReportData.length > 0 && !confirm("Atualizar dados?")) {
+                  updateStats(cachedReportData);
+                  renderCharts(cachedReportData);
+                  return;
+              }
+
+              try {
+                  // Busca sem filtro para garantir compatibilidade
+                  const querySnapshot = await getDocs(collection(db, "ro_tec_sessions"));
+                  
+                  cachedReportData = [];
+                  querySnapshot.forEach((doc) => {
+                      const data = doc.data();
+                      const [datePart, timePart] = doc.id.split('_');
+                      cachedReportData.push({
+                          id: doc.id,
+                          date: datePart || 'Desconhecida',
+                          service: timePart ? timePart.replace('-',':') : '??:??',
+                          tasks: data.tasks || {},
+                          status: data.status,
+                          sortKey: data.createdAt || doc.id 
+                      });
+                  });
+
+                  cachedReportData.sort((a, b) => (a.sortKey < b.sortKey ? -1 : 1));
+                  // Limita a 50 para garantir performance no front
+                  cachedReportData = cachedReportData.slice(-50);
+
+                  updateStats(cachedReportData);
+                  renderCharts(cachedReportData);
+              } catch (error) {
+                  console.error("Erro Relatórios:", error);
+                  alert("Erro ao buscar dados. Verifique o console.");
+              }
+          };
+      }
+
+      function getFilteredData(data) {
+          const selectedDate = historyDateInput.value;
+
+          if (viewMode === 'today') {
+              return data.filter(d => d.date === selectedDate);
+          }
+          if (viewMode === 'current') {
+              // FILTRO EXATO: DATA + HORA DO CULTO
+              return data.filter(d => d.date === selectedDate && d.service === serviceTime);
+          }
+          return data;
+      }
+
+      function updateStats(fullData) {
+          const data = getFilteredData(fullData);
+          document.getElementById("stat-sessions").innerText = data.length;
+          
+          let totalTasks = 0;
+          const userCounts = {};
+
+          data.forEach(session => {
+              if (session.tasks) {
+                  Object.values(session.tasks).forEach(task => {
+                      if (task.checked) {
+                          totalTasks++;
+                          const user = task.user || "Anônimo";
+                          userCounts[user] = (userCounts[user] || 0) + 1;
+                      }
+                  });
               }
           });
 
-          // 4. Gatilho ATIVAR (#MANUTENCAO no Login)
-          const nameInput = document.getElementById("user-name-input");
-          if(nameInput) {
-              nameInput.addEventListener("change", async (e) => {
-                  if(e.target.value.trim().toUpperCase() === "#MANUTENCAO") {
-                      e.target.value = ""; // Limpa comando para não ficar visível
-                      const pwd = await askPassword("BLOQUEAR SISTEMA? 🔒");
-                      if(pwd === MAINT_PASS) {
-                          await setDoc(statusRef, { maintenanceMode: true }, { merge: true });
-                          // alert opcional removido para ficar mais clean
-                      } else if (pwd !== null) {
-                          alert("Senha Incorreta!");
-                      }
+          document.getElementById("stat-tasks").innerText = totalTasks;
+
+          let topUser = "--";
+          let maxCount = 0;
+          Object.entries(userCounts).forEach(([user, count]) => {
+              if(count > maxCount) { maxCount = count; topUser = user; }
+          });
+          document.getElementById("stat-top-user").innerText = topUser;
+      }
+
+      function renderCharts(fullData) {
+          const filteredData = getFilteredData(fullData);
+          const chartData = [...filteredData]; 
+
+          const ctxTimeline = document.getElementById('chart-timeline').getContext('2d');
+          if(chartTimelineInstance) chartTimelineInstance.destroy();
+
+          const dataLuz = chartData.map(d => Object.entries(d.tasks).filter(([k, v]) => k.startsWith('luz') && v.checked).length);
+          const dataTrans = chartData.map(d => Object.entries(d.tasks).filter(([k, v]) => k.startsWith('trans') && v.checked).length);
+          const dataProj = chartData.map(d => Object.entries(d.tasks).filter(([k, v]) => k.startsWith('proj') && v.checked).length);
+
+          // Labels adaptativos
+          const labels = chartData.map(d => {
+              if (viewMode === 'all') {
+                   const parts = d.date.split('-');
+                   return `${parts[2]}/${parts[1]}`; // DD/MM
+              } else {
+                   return d.service; // Mostra Hora se for filtro do dia
+              }
+          });
+
+          chartTimelineInstance = new Chart(ctxTimeline, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [
+                    { label: 'Iluminação', data: dataLuz, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', tension: 0.3 },
+                    { label: 'Transmissão', data: dataTrans, borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', tension: 0.3 },
+                    { label: 'Projeção', data: dataProj, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.3 }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { labels: { color: '#9ca3af' } } },
+                  scales: {
+                      y: { beginAtZero: true, grid: { color: '#374151' }, ticks: { color: '#9ca3af', stepSize: 1 } },
+                      x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                  }
+              }
+          });
+
+          const userCounts = {};
+          filteredData.forEach(session => {
+              Object.values(session.tasks).forEach(task => {
+                  if(task.checked) {
+                      const u = task.user || "Anônimo";
+                      userCounts[u] = (userCounts[u] || 0) + 1;
                   }
               });
-          }
+          });
 
-          // 5. Gatilho DESATIVAR (5 Cliques no ícone de manutenção)
-          let clickCount = 0;
-          const unlockBtn = document.getElementById("maint-unlock-trigger");
-          if(unlockBtn) {
-              unlockBtn.addEventListener("click", async () => {
-                  clickCount++;
-                  if(clickCount === 5) {
-                      clickCount = 0;
-                      const pwd = await askPassword("LIBERAR SISTEMA ✅");
-                      if(pwd === MAINT_PASS) {
-                          await setDoc(statusRef, { maintenanceMode: false }, { merge: true });
-                      } else if (pwd !== null) {
-                          alert("Senha Incorreta!");
+          const ctxUsers = document.getElementById('chart-users').getContext('2d');
+          if(chartUsersInstance) chartUsersInstance.destroy();
+
+          chartUsersInstance = new Chart(ctxUsers, {
+              type: 'doughnut',
+              data: {
+                  labels: Object.keys(userCounts),
+                  datasets: [{
+                      data: Object.values(userCounts),
+                      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                      borderWidth: 0
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: 'right', labels: { color: '#d1d5db', font: {size: 11} } } }
+              }
+          });
+      }
+
+      if(btnExport) {
+          btnExport.onclick = () => {
+              if(cachedReportData.length === 0) return alert("Sem dados.");
+              let csvContent = "data:text/csv;charset=utf-8,Data;Culto;Tarefa;Usuario;Hora;Status\r\n";
+              
+              const dataToExport = getFilteredData(cachedReportData);
+
+              dataToExport.forEach(session => {
+                  Object.entries(session.tasks).forEach(([tid, task]) => {
+                      if(task.checked) {
+                          const dateObj = task.timestamp ? new Date(task.timestamp) : null;
+                          const hora = dateObj ? dateObj.toLocaleTimeString('pt-BR') : "--:--";
+                          csvContent += `${session.date};${session.service};${tid};${task.user};${hora};${session.status || 'aberto'}\r\n`;
                       }
-                  }
-                  setTimeout(() => clickCount = 0, 2000);
+                  });
               });
-          }
-      })();
-
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", `ROTEC_Relatorio_${viewMode}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+          };
+      }
     </script>
   </body>
 </html>
